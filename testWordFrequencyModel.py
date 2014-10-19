@@ -14,4 +14,4 @@ print('finished parsing data')
 
 babyWordFreqModel = WordFrequencyModel()
 babyWordFreqModel.processDomain(Xbaby, Ybaby)
-babyWordFreqModel.printModelDetails()
+babyWordFreqModel.printModelFrequencies()
