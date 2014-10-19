@@ -5,14 +5,15 @@ Query By Committee sample selector: each classifier in the committee is trained 
 
 @author: Inbar
 """
+from QueryByCommitteeSampleSelector import QueryByCommiteeSampleSelector as QBC
 from UncertaintySampleSelector import UncertaintySampleSelector
-from NewSampleSelector import SampleSelector
+#from NewSampleSelector import SampleSelector
 from sklearn.svm import LinearSVC
 
-class QueryByPartialDataCommiteeSampleSelector(SampleSelector):
+class QueryByPartialDataCommiteeSampleSelector(QBC):
     
     def __init__(self, sourceClassifier):
-        self.committee = [sourceClassifier]
+        QBC.__init__(self, sourceClassifier)
     
     '''
     samplesPool: a pool of samples to select from
@@ -41,27 +42,3 @@ class QueryByPartialDataCommiteeSampleSelector(SampleSelector):
         classifier.fit(X,Y)
         return classifier
     
-    def selectControvercialSamples(self, samplesPool, batchSize):
-        print('select controvercial samples')
-        samples = samplesPool[0] #samples: X
-        
-        disagreementsDict = {}
-        for i in range(len(samplesPool[1])):
-            agreementsScore = self.getAgreementsScoreForSample(samples[i])
-            disagreementsDict[i] = agreementsScore
-                        
-        return self.selectHighestRatedSamples(disagreementsDict, samplesPool, batchSize)   
-        
-    def getAgreementsScoreForSample(self, sample):
-        numOfPositivePredictions = 0
-        numOfNegativePredictions = 0
-        #the smaller the score, the more controvertial the sample is
-        for classifier in self.committee:
-            perdiction = classifier.predict(sample)
-            if perdiction == 1:
-                numOfPositivePredictions += 1
-            else:
-                numOfNegativePredictions += 1
-        
-        score = 1 - min(numOfPositivePredictions/len(self.committee), numOfNegativePredictions/len(self.committee))
-        return score

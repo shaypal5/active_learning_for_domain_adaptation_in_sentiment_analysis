@@ -7,6 +7,8 @@ Created on Wed Oct 15 18:33:19 2014
 
 from UncertaintySampleSelector import UncertaintySampleSelector
 from QueryByPartialDataCommiteeSampleSelector import QueryByPartialDataCommiteeSampleSelector
+from TargetAndSourceQBCSampleSelector import TargetAndSourceQBCSampleSelector
+
 import ActiveLearner
 import parseProcessedDataFileForScikit
 
@@ -67,7 +69,8 @@ targetClassifier = LinearSVC()
 targetClassifier.fit(newTrainXtarget,newTrainYtarget)
 
 #selector = UncertaintySampleSelector()
-selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
+#selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
+selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
 
 learner = ActiveLearner.ActiveLearner(selector)
 resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsource],[newTrainXtarget,newTrainYtarget])
