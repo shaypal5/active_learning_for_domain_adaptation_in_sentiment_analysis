@@ -19,12 +19,12 @@ print('Testing the WordFrequencyModel class')
 trainX, trainY = parseProcessedDataFileForScikit.parseDataFile(domain.getTrainFileFullPath())
 print('finished parsing data')
 
-babyWordFreqModel = WordFrequencyModel()
-babyWordFreqModel.processDomain(trainX, trainY)
-babyWordFreqModel.printModelDetails()
+domainWordFreqModel = WordFrequencyModel()
+domainWordFreqModel.processDomain(trainX, trainY)
+domainWordFreqModel.printModelDetails()
 
 print("Generating new instance:")
-newInst = babyWordFreqModel.generateInstance()
+newInst = domainWordFreqModel.generateInstance()
 print("Instance length: %d" % len(newInst[0]))
 #print(newInst[0])
 
@@ -61,7 +61,7 @@ print("Got "+str(wrong)+" wrong.")
 
 #Now checking an SVM with generated data
 print("Generating data set of size %d" % trainSize)
-generatedX, generatedY = babyWordFreqModel.generateDataset(trainSize)
+generatedX, generatedY = domainWordFreqModel.generateDataset(trainSize)
 print("generated %d instances" % len(generatedX))
 print("generated %d labels" % len(generatedY))
 #print(generatedY)

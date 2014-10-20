@@ -51,24 +51,22 @@ class WordFrequencyModel:
         for i in range(len(X)):
             self.processLine(X[i],Y[i]==1)
         
+        #build word distribution for positive instances
         for word in self.totalPosFreq :
-            self.totalPosFreq[word] = self.totalPosFreq[word] / self.totalPosWords
-            
-            
+            self.totalPosFreq[word] = self.totalPosFreq[word] / self.totalPosWords  
         self.posTokenizer = dict(zip(list(range(len(self.totalPosFreq.keys()))), list(self.totalPosFreq.keys())))            
         self.posDist = stats.rv_discrete(name='positiveDist', values=(list(range(len(self.totalPosFreq.keys()))), list(self.totalPosFreq.values())))
         
+        #build word distribution for negative instances
         for word in self.totalNegFreq :
             self.totalNegFreq[word] = self.totalNegFreq[word] / self.totalNegWords
-        
         self.negTokenizer = dict(zip(list(range(len(self.totalNegFreq.keys()))), list(self.totalNegFreq.keys())))            
         self.negDist = stats.rv_discrete(name='negativeDist', values=(list(range(len(self.totalNegFreq.keys()))), list(self.totalNegFreq.values())))
-            
-        self.averageLineLength = (self.totalPosWords+self.totalNegWords) / len(X)
         
+        #build line length distribution
+        self.averageLineLength = (self.totalPosWords+self.totalNegWords) / len(X)
         for length in self.lineLengthDict:
             self.lineLengthDict[length] = self.lineLengthDict[length] / len(X)
-            
         self.lineLengthDist = stats.rv_discrete(name='lineLengthDist', values=(list(self.lineLengthDict.keys()), list(self.lineLengthDict.values())))
             
     def printModelFrequencies(self):
@@ -79,6 +77,7 @@ class WordFrequencyModel:
         for word in self.totalNegFreq :
             print("%s : %0.8f" % (word,self.totalNegFreq[word]))
             
+    #labelIsPositive = 0 for Negative label, 1 for Positive label, 2 for random
     def generateInstance(self, labelIsPositive = 2):
         
         instLength = self.lineLengthDist.rvs(size=1)[0]
