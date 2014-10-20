@@ -24,7 +24,6 @@ class SentimentWordFrequencyModel:
         self.totalPosInstances = 0
         self.totalNegInstances = 0
         
-        
         self.totalPosWordsInDomain = 0 #total number of positive words in positive instance in the entire domain
         self.totalNegWordsInDomain = 0 #total number of negative words in negative instance in the entire domain
         self.totalObjWordsInDomain = 0 #total number of objective words in all instance in the entire domain
@@ -40,8 +39,8 @@ class SentimentWordFrequencyModel:
         self.negLineLengthDict = {}
         
         #sentiment-full word percentage for positive and negative sentences
-        self.sentWordPercentageInPos = {}
-        self.sentWordPercentageInNeg = {}
+        self.sentWordPercentageInPos = 0
+        self.sentWordPercentageInNeg = 0
     
     def getSentimentOfWord(self, word):
         sentSet = list(swn.senti_synsets(word))
@@ -69,8 +68,10 @@ class SentimentWordFrequencyModel:
         if len(line) in self.posLineLengthDict:
             self.posLineLengthDict[len(line)] += 1
         else:
-            self.posLineLengthDict[len(line)] = 1  
-            
+            self.posLineLengthDict[len(line)] = 1
+
+        totalPosInThisLine = 0        
+        
         for key in line:
             wordSent = self.getSentimentOfWord(key)
             if wordSent != -1: #if this word is not negative
@@ -80,17 +81,23 @@ class SentimentWordFrequencyModel:
                 if wordSent == 1: #if this is a positive word
                     freq = self.totalPosFreq
                     self.totalPosWordsInDomain += line[key]
+                    totalPosInThisLine += line[key]
                 
                 if key in freq:
                     freq[key] = freq[key] + line[key]
                 else:
                     freq[key] = freq[key]
+                    
+        posPercentage = totalPosInThisLine / len(line)
+        self.sentWordPercentageInPos += posPercentage
         
     def processNegativeLine(self, line):        
         if len(line) in self.negLineLengthDict:
             self.negLineLengthDict[len(line)] += 1
         else:
             self.negLineLengthDict[len(line)] = 1  
+
+        totalNegInThisLine = 0        
             
         for key in line:
             wordSent = self.getSentimentOfWord(key)
@@ -101,11 +108,15 @@ class SentimentWordFrequencyModel:
                 if wordSent == -1: #if this is a negative word
                     freq = self.totalNegFreq
                     self.totalNegWordsInDomain += line[key]
+                    totalNegInThisLine += line[key]
                 
                 if key in freq:
                     freq[key] = freq[key] + line[key]
                 else:
                     freq[key] = freq[key]
+                    
+        negPercentage = totalNegInThisLine / len(line)
+        self.sentWordPercentageInNeg += negPercentage
         
 
     def processLine(self, line, isPositiveLine):
@@ -121,6 +132,9 @@ class SentimentWordFrequencyModel:
     def processDomain(self, X, Y):
         for i in range(len(X)):
             self.processLine(X[i],Y[i]==1)
+            
+        self.sentWordPercentageInPos = self.sentWordPercentageInPos / self.totalPosInstances
+        self.sentWordPercentageInNeg = self.sentWordPercentageInNeg / self.totalNegInstances
         
         #build word distribution for positive words
         for word in self.totalPosFreq :
@@ -149,3 +163,30 @@ class SentimentWordFrequencyModel:
         for length in self.negLineLengthDict:
             self.negLineLengthDict[length] = self.negLineLengthDict[length] / self.totalNegInstances
         self.negLineLengthDist = stats.rv_discrete(name='negLineLengthDist', values=(list(self.negLineLengthDict.keys()), list(self.negLineLengthDict.values())))
+        
+    #labelIsPositive = 0 for Negative label, 1 for Positive label, 2 for random
+    def generateInstance(self, labelIsPositive = 2):
+        if labelIsPositive == 2:
+            labelIsPositive = np.random.randint(0, 2, size=1)   
+        
+        if labelIsPositive:
+            instLength = self.posLineLengthDist.rvs(size=1)[0]
+        else:
+            instLength = self.negLineLengthDist.rvs(size=1)[0]
+            
+        newInst = {}
+        
+        for i in range(instLength):
+            if labelIsPositive:
+                randomToken = self.posDist.rvs(size=1)[0]
+                randomWord = self.posTokenizer[randomToken]
+            else:
+                randomToken = self.negDist.rvs(size=1)[0]
+                randomWord = self.negTokenizer[randomToken]
+                
+            if randomWord in newInst:
+                newInst[randomWord] += 1
+            else:
+                newInst[randomWord] = 1
+        
+        return [newInst, labelIsPositive]
