@@ -71,7 +71,12 @@ resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsour
 print("target classifier was trained on {0} labeled instances".format(len(newTrainYtarget)))
 
 #Test source classifier
+print("")
 print("Test source classifier")
+TP = 0
+FP = 0
+TN = 0
+FN = 0
 correct = 0
 wrong = 0
 newTestX = vectorizer.transform(testXtarget)
@@ -80,13 +85,29 @@ for i in range(len(testXtarget)):
     prediction = sourceClassifier.predict(newTestX[i])
     if classes[prediction] == testYtarget[i]:
         correct += 1
+        if classes[prediction] == 1:
+            TP += 1
+        else:
+            TN += 1
     else:
         wrong += 1
-print("Got "+str(correct)+" correct.")
-print("Got "+str(wrong)+" wrong.")
+        if classes[prediction] == 1:
+            FP += 1
+        else:
+            FN += 1
+print("TP: {0} FP: {1} TN: {2} FN: {3}".format(TP, FP, TN, FN))
+precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
+recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
+print("correct: {0}, wrong: {1}".format(correct, wrong))
 
-#Test target classifier
-print("Test target classifier")
+print("")    
+print("test target classifier")
+TP = 0
+FP = 0
+TN = 0
+FN = 0
 correct = 0
 wrong = 0
 newTestX = vectorizer.transform(testXtarget)
@@ -95,13 +116,29 @@ for i in range(len(testXtarget)):
     prediction = targetClassifier.predict(newTestX[i])
     if classes[prediction] == testYtarget[i]:
         correct += 1
+        if classes[prediction] == 1:
+            TP += 1
+        else:
+            TN += 1
     else:
         wrong += 1
-print("Got "+str(correct)+" correct.")
-print("Got "+str(wrong)+" wrong.")
-        
-#Test result classifier
-print("Test result classifier")
+        if classes[prediction] == 1:
+            FP += 1
+        else:
+            FN += 1
+print("TP: {0} FP: {1} TN: {2} FN: {3}".format(TP, FP, TN, FN))
+precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
+recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
+print("correct: {0}, wrong: {1}".format(correct, wrong))
+
+print("")    
+print("test active learning classifier")    
+TP = 0
+FP = 0
+TN = 0
+FN = 0
 correct = 0
 wrong = 0
 newTestX = vectorizer.transform(testXtarget)
@@ -110,9 +147,21 @@ for i in range(len(testXtarget)):
     prediction = resultClassifier.predict(newTestX[i])
     if classes[prediction] == testYtarget[i]:
         correct += 1
+        if classes[prediction] == 1:
+            TP += 1
+        else:
+            TN += 1
     else:
         wrong += 1
-print("Got "+str(correct)+" correct.")
-print("Got "+str(wrong)+" wrong.")
+        if classes[prediction] == 1:
+            FP += 1
+        else:
+            FN += 1
+print("TP: {0} FP: {1} TN: {2} FN: {3}".format(TP, FP, TN, FN))
+precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
+recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
+print("correct: {0}, wrong: {1}".format(correct, wrong))
 
 print("Test done")
