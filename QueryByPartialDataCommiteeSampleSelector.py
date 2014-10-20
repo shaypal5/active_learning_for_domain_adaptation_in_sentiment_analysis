@@ -27,7 +27,7 @@ class QueryByPartialDataCommiteeSampleSelector(QBC):
             samplesAndIndices = uncertaintySelector.selectSamples(currTargetClassifier, samplesPool, batchSize)
             #print(type(self.committee))
         else:
-            samplesAndIndices = self.selectControvercialSamples(samplesPool, batchSize)
+            samplesAndIndices = self.selectControvercialSamples(samplesPool, batchSize, currTargetClassifier)
         samples = samplesAndIndices[0] #samples are the instances and labels - [(x1, x2...), (y1, y2,...)]
         self.committee.append(self.trainNewClassifier(samples)) #train a new classifier and add to the committe
         return samplesAndIndices

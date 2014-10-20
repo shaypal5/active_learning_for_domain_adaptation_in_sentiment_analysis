@@ -16,7 +16,7 @@ class UncertaintySampleSelector(SampleSelector):
         for i in range(len(confidence_scores)):
             confDict[i] = abs(confidence_scores[i])
         
-        return self.selectHighestRatedSamples(confDict, samplesPool, batchSize)
+        return self.selectHighestRatedSamples(confDict, samplesPool, batchSize, svm)
                 
         
             

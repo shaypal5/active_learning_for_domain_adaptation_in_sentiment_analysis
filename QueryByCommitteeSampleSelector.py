@@ -10,9 +10,11 @@ from NewSampleSelector import SampleSelector
 class QueryByCommiteeSampleSelector(SampleSelector):
     
     def __init__(self, sourceClassifier):
+        SampleSelector.__init__(self)
         self.committee = [sourceClassifier]
+        SampleSelector.randomTieBreak = 0
         
-    def selectControvercialSamples(self, samplesPool, batchSize):
+    def selectControvercialSamples(self, samplesPool, batchSize, currClassifier):
         samples = samplesPool[0] #samples: X
         
         disagreementsDict = {}
@@ -20,7 +22,7 @@ class QueryByCommiteeSampleSelector(SampleSelector):
             agreementsScore = self.getAgreementsScoreForSample(samples[i])
             disagreementsDict[i] = agreementsScore
                         
-        return self.selectHighestRatedSamples(disagreementsDict, samplesPool, batchSize)   
+        return self.selectHighestRatedSamples(disagreementsDict, samplesPool, batchSize, currClassifier)   
         
     def getAgreementsScoreForSample(self, sample):
         numOfPositivePredictions = 0

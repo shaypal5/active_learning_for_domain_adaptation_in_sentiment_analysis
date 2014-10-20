@@ -27,6 +27,6 @@ class TargetAndSourceQBCSampleSelector(QBC):
             self.firstQuery = 0
         else:
             self.committee[1] = currTargetClassifier #update target classifier
-            samplesAndIndices = self.selectControvercialSamples(samplesPool, batchSize)
+            samplesAndIndices = self.selectControvercialSamples(samplesPool, batchSize, currTargetClassifier)
         return samplesAndIndices
         

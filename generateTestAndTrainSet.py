@@ -75,4 +75,4 @@ def generateTestAndTrainSet(domain):
     testFile.flush()
     testFile.close()
 
-generateTestAndTrainSet(BlitzerDatasetDomain.books)
+generateTestAndTrainSet(BlitzerDatasetDomain.jewelry)

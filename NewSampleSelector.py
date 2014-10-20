@@ -7,12 +7,16 @@ Created on Sat Oct 18 17:49:48 2014
 import scipy.sparse as sp
 import operator
 import random
+#from UncertaintySampleSelector import UncertaintySampleSelector
 
 class SampleSelector:
     SCORE = 1
     SAMPLE_INDEX = 0
     
-    def selectHighestRatedSamples(self, samplesRating, samplesPool, batchSize):
+    def __init__(self):
+        self.randomTieBreaker = 1
+    
+    def selectHighestRatedSamples(self, samplesRating, samplesPool, batchSize, currClassifier):
         print("new sample selector!")
         samples = samplesPool[0]
         labels = samplesPool[1]
@@ -33,7 +37,7 @@ class SampleSelector:
             if sampleScore <= bestAvailableScore: #reminder: the smaller the score, the better
                 bestScoreIndices.append(ind)
             else:
-                result = self.addSamplesToBatch(batch, batchLabels, bestScoreIndices, samplesPool, batchSize, indexList)
+                result = self.addSamplesToBatch(batch, batchLabels, bestScoreIndices, samplesPool, batchSize, indexList, currClassifier)
                 batch = result[0]
                 batchLabels = result[1]
                 indexList = result[2]
@@ -44,7 +48,7 @@ class SampleSelector:
             
         return [[batch,batchLabels],indexList]
     
-    def addSamplesToBatch(self, batch, batchLabels, bestScoreIndices, samplesPool, batchSize, indexList):
+    def addSamplesToBatch(self, batch, batchLabels, bestScoreIndices, samplesPool, batchSize, indexList, currClassifier):
         samples = samplesPool[0]
         labels = samplesPool[1]
         numOfNeededSamples = batchSize - len(batchLabels)
@@ -59,11 +63,30 @@ class SampleSelector:
                 indexList.append(ind)            
         else:
             #add numOfNeededSamples
-            randomIndices = random.sample(set(bestScoreIndices), numOfNeededSamples)
-            for i in range(len(randomIndices)):
-                ind = randomIndices[i]
-                batch = sp.vstack([batch, samples[ind]])
-                batchLabels.append(labels[ind])
-                indexList.append(ind)
-                
+            if self.randomTieBreaker:
+                randomIndices = random.sample(set(bestScoreIndices), numOfNeededSamples)
+                for i in range(len(randomIndices)):
+                    ind = randomIndices[i]
+                    batch = sp.vstack([batch, samples[ind]])
+                    batchLabels.append(labels[ind])
+                    indexList.append(ind)
+            else:
+                print('not random!!!!!!!!!!!!!!1')
+                ind = bestScoreIndices[0]
+                tmpBatch = samples[0]
+                tmpBatchLabels = [labels[ind]]
+                indexMapping = {}
+                for i in range(1, len(bestScoreIndices)):
+                    ind = bestScoreIndices[i]
+                    tmpBatch = sp.vstack([batch, samples[ind]])
+                    tmpBatchLabels.append(labels[ind])
+                    indexMapping[i] = ind
+                result = UncertaintySampleSelector.selectSamples(currClassifier,[tmpBatch, tmpBatchLabels],numOfNeededSamples)
+                newIndices = result[1]
+                for i in range(len(newIndices)):
+                   ind = indexMapping[newIndices[i]]
+                   batch = sp.vstack([batch, samples[ind]])
+                   batchLabels.append(labels[ind])
+                   indexList.append(ind)                               
+               
         return [batch, batchLabels, indexList]
