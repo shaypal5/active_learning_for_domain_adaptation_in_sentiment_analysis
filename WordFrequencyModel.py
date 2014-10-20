@@ -115,7 +115,7 @@ class WordFrequencyModel:
             
         for i in range(negNum):
             X.append(self.generateInstance(0)[0])
-            Y.append(-1)
+            Y.append(0)
             
         return [X,Y]
             

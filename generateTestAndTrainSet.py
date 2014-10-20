@@ -53,7 +53,7 @@ def generateTestAndTrainSet(domain):
     file.close()
     print("Finished building train and test sets")
     print("train size = "+str(len(trainSet)))
-    print("train size = "+str(len(testSet)))
+    print("test size = "+str(len(testSet)))
             
         #balancedDataSet.append(line)
     
@@ -75,4 +75,4 @@ def generateTestAndTrainSet(domain):
     testFile.flush()
     testFile.close()
 
-generateTestAndTrainSet(BlitzerDatasetDomain.baby)
+generateTestAndTrainSet(BlitzerDatasetDomain.books)
