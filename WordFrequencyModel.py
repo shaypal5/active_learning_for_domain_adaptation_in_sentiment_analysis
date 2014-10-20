@@ -6,8 +6,8 @@ Created on Fri Oct 17 14:26:42 2014
 """
 
 import matplotlib.pyplot as plt
+import numpy as np
 from scipy import stats
-import msvcrt
 
 class WordFrequencyModel:
     
@@ -79,12 +79,45 @@ class WordFrequencyModel:
         for word in self.totalNegFreq :
             print("%s : %0.8f" % (word,self.totalNegFreq[word]))
             
-    def generateInstance(self):
+    def generateInstance(self, labelIsPositive = 2):
+        
         instLength = self.lineLengthDist.rvs(size=1)[0]
         newInst = {}
-        isLabelPositive = np.random.randint(0, 2, size=1)
+        if labelIsPositive == 2:
+            labelIsPositive = np.random.randint(0, 2, size=1)            
+        
         for i in range(instLength):
-            randomToken = 
+            if labelIsPositive:
+                randomToken = self.posDist.rvs(size=1)[0]
+                randomWord = self.posTokenizer[randomToken]
+            else:
+                randomToken = self.negDist.rvs(size=1)[0]
+                randomWord = self.negTokenizer[randomToken]
+                
+            if randomWord in newInst:
+                newInst[randomWord] += 1
+            else:
+                newInst[randomWord] = 1
+        
+        return [newInst, labelIsPositive]
+        
+        
+    def generateDataset(self, size, positivePercentage = 0.5):
+        
+        posNum = round(size * positivePercentage)
+        negNum = size - posNum
+        X = []
+        Y = []
+            
+        for i in range(posNum):
+            X.append(self.generateInstance(1)[0])
+            Y.append(1)
+            
+        for i in range(negNum):
+            X.append(self.generateInstance(0)[0])
+            Y.append(-1)
+            
+        return [X,Y]
             
     def printModelDetails(self):
         

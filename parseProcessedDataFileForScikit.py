@@ -23,7 +23,7 @@ def parseLine(line):
     if re.search(labelRegex,line).group(3) == 'positive':
         label = 1
     else:
-        label = -1
+        label = 0
     #print("label = "+str(label))
     pattern = re.compile(tokenCountRegex)
     return [dict([(token, float(occurences)) for (token, dots, occurences) in re.findall(pattern, line)]),label]
