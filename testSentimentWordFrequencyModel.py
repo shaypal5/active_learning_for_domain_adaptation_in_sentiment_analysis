@@ -10,34 +10,25 @@ from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
 from BlitzerDatasetDomain import BlitzerDatasetDomain
-from WordFrequencyModel import WordFrequencyModel
+from SentimentWordFrequencyModel import SentimentWordFrequencyModel
 import parseProcessedDataFileForScikit
-
-sourceDomain = BlitzerDatasetDomain.baby
-domain = BlitzerDatasetDomain.automotive
-
-print('Testing the WordFrequencyModel class')
-trainX, trainY = parseProcessedDataFileForScikit.parseDataFile(domain.getTrainFileFullPath())
-print('finished parsing data')
-
-domainWordFreqModel = WordFrequencyModel()
-domainWordFreqModel.processDomain(trainX, trainY)
-domainWordFreqModel.printModelDetails()
-
-print("Generating new instance:")
-newInst = domainWordFreqModel.generateInstance()
-print("Instance length: %d" % len(newInst[0]))
-#print(newInst[0])
 
 #======================================================
 #   comparing with non-generated data taught SVM
 #======================================================
+domain = BlitzerDatasetDomain.apparel
 
+print('Testing the SentimentWordFrequencyModel class')
 #Get non-generated train and test sets
-#already got trainX and trainY above
-#trainX, trainY = parseProcessedDataFileForScikit.parseDataFile(domain.getTrainFileFullPath())
+trainX, trainY = parseProcessedDataFileForScikit.parseDataFile(domain.getTrainFileFullPath())
 testX, testY = parseProcessedDataFileForScikit.parseDataFile(domain.getTestFileFullPath())
 trainSize = len(trainX)
+print('finished parsing data')
+
+domainWordFreqModel = SentimentWordFrequencyModel()
+domainWordFreqModel.processDomain(trainX, trainY)
+#domainWordFreqModel.printModelDetails()
+print('finished building model')
 
 vectorizer = DictVectorizer(dtype=float, sparse=True)
 encoder = LabelEncoder()

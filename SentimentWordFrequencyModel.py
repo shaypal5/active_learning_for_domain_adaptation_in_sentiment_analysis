@@ -44,6 +44,14 @@ class SentimentWordFrequencyModel:
     
     def getSentimentOfWord(self, word):
         sentSet = list(swn.senti_synsets(word))
+        
+        #if not found, assume objective word
+        if len(sentSet) == 0:
+            #print('empty sentSet for word '+word)
+            return 0
+        #else:
+            #print('non empty sentSet for word '+word)
+            
         totalPos = 0
         totalNeg = 0
         totalObj = 0
@@ -86,7 +94,7 @@ class SentimentWordFrequencyModel:
                 if key in freq:
                     freq[key] = freq[key] + line[key]
                 else:
-                    freq[key] = freq[key]
+                    freq[key] = line[key]
                     
         posPercentage = totalPosInThisLine / len(line)
         self.sentWordPercentageInPos += posPercentage
@@ -113,7 +121,7 @@ class SentimentWordFrequencyModel:
                 if key in freq:
                     freq[key] = freq[key] + line[key]
                 else:
-                    freq[key] = freq[key]
+                    freq[key] = line[key]
                     
         negPercentage = totalNegInThisLine / len(line)
         self.sentWordPercentageInNeg += negPercentage
@@ -171,12 +179,15 @@ class SentimentWordFrequencyModel:
         
         if labelIsPositive:
             instLength = self.posLineLengthDist.rvs(size=1)[0]
+            numOfSent = int(round(self.sentWordPercentageInPos * instLength))
         else:
             instLength = self.negLineLengthDist.rvs(size=1)[0]
-            
+            numOfSent = int(round(self.sentWordPercentageInNeg * instLength))
+        
+        numOfObj = instLength - numOfSent            
         newInst = {}
         
-        for i in range(instLength):
+        for i in range(numOfSent):
             if labelIsPositive:
                 randomToken = self.posDist.rvs(size=1)[0]
                 randomWord = self.posTokenizer[randomToken]
@@ -189,4 +200,30 @@ class SentimentWordFrequencyModel:
             else:
                 newInst[randomWord] = 1
         
+        for i in range(numOfObj):
+            randomToken = self.objDist.rvs(size=1)[0]
+            randomWord = self.objTokenizer[randomToken]
+                
+            if randomWord in newInst:
+                newInst[randomWord] += 1
+            else:
+                newInst[randomWord] = 1
+        
         return [newInst, labelIsPositive]
+        
+        
+    def generateDataset(self, size, positivePercentage = 0.5):
+        posNum = round(size * positivePercentage)
+        negNum = size - posNum
+        X = []
+        Y = []
+            
+        for i in range(posNum):
+            X.append(self.generateInstance(1)[0])
+            Y.append(1)
+            
+        for i in range(negNum):
+            X.append(self.generateInstance(0)[0])
+            Y.append(0)
+            
+        return [X,Y]
