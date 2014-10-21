@@ -42,7 +42,7 @@ class ActiveLearner:
         targetTrainData = sourceTrainData #use all the source train data as well
         targetTrainData[1] = targetTrainData[1].tolist()
         while not self.isStoppingConditionMet(self.stoppingCondition, i, improvement):
-            print("iteration number "+str(i))
+            #print("iteration number "+str(i))
             result = self.sampleSelector.selectSamples(targetClassifier,unusedTargetData,self.batch_size)
             selectedSamples = result[0]
             selectedIndices = result[1]

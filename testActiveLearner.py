@@ -17,8 +17,9 @@ from sklearn.svm import LinearSVC
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
-sourceDomain = BlitzerDatasetDomain.apparel
-targetDomain = BlitzerDatasetDomain.jewelry
+sourceDomain = BlitzerDatasetDomain.jewelry
+targetDomain = BlitzerDatasetDomain.beauty
+print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
 
 #Parsing train and test data for source domain
 trainXsource, trainYsource  = parseProcessedDataFileForScikit.parseDataFile(sourceDomain.getTrainFileFullPath())
@@ -31,15 +32,15 @@ encoder = LabelEncoder()
 trainXtarget, trainYtarget  = parseProcessedDataFileForScikit.parseDataFile(targetDomain.getTrainFileFullPath())
 testXtarget, testYtarget = parseProcessedDataFileForScikit.parseDataFile(targetDomain.getTestFileFullPath())
 trainTargetSize = len(trainXtarget)
-print(type(trainXtarget))
+#print(type(trainXtarget))
 
 #vectorize!
 vectorized = vectorizer.fit_transform(trainXsource+trainXtarget)
 vectorizedLabels = encoder.fit_transform(trainYsource+trainYtarget)
 total = trainSourceSize+trainTargetSize
 
-print(type(vectorized))
-print(type(vectorized[0]))
+#print(type(vectorized))
+#print(type(vectorized[0]))
 print("num of features: "+str(vectorized[0].get_shape()[1]))
 numOfFeatures = vectorized[0].get_shape()[1]
 
@@ -54,24 +55,11 @@ newTrainYtarget = vectorizedLabels[trainSourceSize+1:total]
 #print(newTrainXapparel)
 
 #train classifier on source domain
+print("")
+print("=================================================================================")
 sourceClassifier = LinearSVC()
 sourceClassifier.fit(newTrainXsource,newTrainYsource)
-
-#train classifier on target domain
-targetClassifier = LinearSVC()
-targetClassifier.fit(newTrainXtarget,newTrainYtarget)
-
-selector = UncertaintySampleSelector()
-#selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
-#selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
-
-learner = ActiveLearner.ActiveLearner(selector)
-resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsource],[newTrainXtarget,newTrainYtarget])
-
-print("target classifier was trained on {0} labeled instances".format(len(newTrainYtarget)))
-
-#Test source classifier
-print("")
+print("Source classifier was trained on %d labeled instances" % (len(newTrainYsource)))
 print("Test source classifier")
 TP = 0
 FP = 0
@@ -102,7 +90,12 @@ accuracy = (TP + TN) / (TP + TN + FP + FN)
 print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
 print("correct: {0}, wrong: {1}".format(correct, wrong))
 
-print("")    
+#train classifier on target domain
+print("")
+print("=================================================================================")
+targetClassifier = LinearSVC()
+targetClassifier.fit(newTrainXtarget,newTrainYtarget)
+print("target classifier was trained on {0} labeled instances".format(len(newTrainYtarget)))
 print("test target classifier")
 TP = 0
 FP = 0
@@ -133,8 +126,13 @@ accuracy = (TP + TN) / (TP + TN + FP + FN)
 print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
 print("correct: {0}, wrong: {1}".format(correct, wrong))
 
-print("")    
-print("test active learning classifier")    
+
+print("")
+print("=================================================================================") 
+print("test active learning classifier with UNCERTAINTY sample selector")    
+selector = UncertaintySampleSelector()
+learner = ActiveLearner.ActiveLearner(selector)
+resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsource],[newTrainXtarget,newTrainYtarget])
 TP = 0
 FP = 0
 TN = 0
@@ -163,5 +161,77 @@ recall = TP / (TP + FN) #out of all the positive examples there were, what fract
 accuracy = (TP + TN) / (TP + TN + FP + FN)
 print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
 print("correct: {0}, wrong: {1}".format(correct, wrong))
+
+
+print("")
+print("=================================================================================")   
+print("test active learning classifier with *Query By Partial Data Commitee* sample selector") 
+selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
+learner = ActiveLearner.ActiveLearner(selector)
+resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsource],[newTrainXtarget,newTrainYtarget])   
+TP = 0
+FP = 0
+TN = 0
+FN = 0
+correct = 0
+wrong = 0
+newTestX = vectorizer.transform(testXtarget)
+classes = encoder.classes_
+for i in range(len(testXtarget)):
+    prediction = resultClassifier.predict(newTestX[i])
+    if classes[prediction] == testYtarget[i]:
+        correct += 1
+        if classes[prediction] == 1:
+            TP += 1
+        else:
+            TN += 1
+    else:
+        wrong += 1
+        if classes[prediction] == 1:
+            FP += 1
+        else:
+            FN += 1
+print("TP: {0} FP: {1} TN: {2} FN: {3}".format(TP, FP, TN, FN))
+precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
+recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
+print("correct: {0}, wrong: {1}".format(correct, wrong))
+
+print("")
+print("=================================================================================") 
+print("test active learning classifier with *Target & Source QBC* sample selector") 
+selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
+learner = ActiveLearner.ActiveLearner(selector)
+resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsource],[newTrainXtarget,newTrainYtarget]) 
+TP = 0
+FP = 0
+TN = 0
+FN = 0
+correct = 0
+wrong = 0
+newTestX = vectorizer.transform(testXtarget)
+classes = encoder.classes_
+for i in range(len(testXtarget)):
+    prediction = resultClassifier.predict(newTestX[i])
+    if classes[prediction] == testYtarget[i]:
+        correct += 1
+        if classes[prediction] == 1:
+            TP += 1
+        else:
+            TN += 1
+    else:
+        wrong += 1
+        if classes[prediction] == 1:
+            FP += 1
+        else:
+            FN += 1
+print("TP: {0} FP: {1} TN: {2} FN: {3}".format(TP, FP, TN, FN))
+precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
+recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
+accuracy = (TP + TN) / (TP + TN + FP + FN)
+print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
+print("correct: {0}, wrong: {1}".format(correct, wrong))
+
 
 print("Test done")

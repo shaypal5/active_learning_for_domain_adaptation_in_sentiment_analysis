@@ -23,6 +23,7 @@ def countPosInFile(filePath):
     return total,posNum
 
 def generateTestAndTrainSet(domain):
+    print("Generating test and train set for domain %s" % domain.value)
     TRAIN_PERCENT = 0.7
     trainSet = []
     testSet = []
@@ -75,4 +76,5 @@ def generateTestAndTrainSet(domain):
     testFile.flush()
     testFile.close()
 
-generateTestAndTrainSet(BlitzerDatasetDomain.apparel)
+for domain in BlitzerDatasetDomain:
+    generateTestAndTrainSet(domain)

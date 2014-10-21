@@ -53,4 +53,25 @@ class BlitzerDatasetDomain(Enum):
             
     def getTestFileFullPath(self):
         return self.getDomainPath() + 'processed.review.testset'
+        
+    def getNumOfTotalInstanceInDomain(self):
+        count = 0
+        file = open(self.getBalancedFileFullPath())
+        for line in file:
+            count += 1
+        return count
+        
+    def getNumOfTrainInstanceInDomain(self):
+        count = 0
+        file = open(self.getTrainFileFullPath())
+        for line in file:
+            count += 1
+        return count
+        
+    def getNumOfTestInstanceInDomain(self):
+        count = 0
+        file = open(self.getTestFileFullPath())
+        for line in file:
+            count += 1
+        return count
     

@@ -20,7 +20,7 @@ class QueryByPartialDataCommiteeSampleSelector(QBC):
     batchSize: number of samples to select
     '''
     def selectSamples(self, currTargetClassifier, samplesPool, batchSize):
-        print('QBC')
+        #print('QBC')
         #if there is only one classifier in the committee, use UncertaintySampleSelector as selection strategy.        
         if len(self.committee) < 2:
             uncertaintySelector = UncertaintySampleSelector()
@@ -33,11 +33,11 @@ class QueryByPartialDataCommiteeSampleSelector(QBC):
         return samplesAndIndices
         
     def trainNewClassifier(self, trainData):
-        print('new classifier to committee')
+        #print('new classifier to committee')
         #trainData are the instances and labels - [(x1, x2...), (y1, y2,...)]
         X = trainData[0]
         Y = trainData[1]
-        print("number of samples for new classifier is {0}".format(len(Y)))
+        #print("number of samples for new classifier is {0}".format(len(Y)))
         classifier = LinearSVC()
         classifier.fit(X,Y)
         return classifier
