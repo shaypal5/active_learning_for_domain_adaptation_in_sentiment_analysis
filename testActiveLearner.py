@@ -61,9 +61,9 @@ sourceClassifier.fit(newTrainXsource,newTrainYsource)
 targetClassifier = LinearSVC()
 targetClassifier.fit(newTrainXtarget,newTrainYtarget)
 
-#selector = UncertaintySampleSelector()
+selector = UncertaintySampleSelector()
 #selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
-selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
+#selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
 
 learner = ActiveLearner.ActiveLearner(selector)
 resultClassifier = learner.train(sourceClassifier,[newTrainXsource,newTrainYsource],[newTrainXtarget,newTrainYtarget])

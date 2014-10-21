@@ -17,7 +17,7 @@ class SampleSelector:
         self.randomTieBreaker = 1
     
     def selectHighestRatedSamples(self, samplesRating, samplesPool, batchSize, currClassifier):
-        print("new sample selector!")
+        #print("new sample selector!")
         samples = samplesPool[0]
         labels = samplesPool[1]
         sortedSamplesRating = sorted(samplesRating.items(), key=operator.itemgetter(1))        
