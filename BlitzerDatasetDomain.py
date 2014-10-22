@@ -59,6 +59,7 @@ class BlitzerDatasetDomain(Enum):
         file = open(self.getBalancedFileFullPath())
         for line in file:
             count += 1
+        file.close()
         return count
         
     def getNumOfTrainInstanceInDomain(self):
@@ -66,6 +67,7 @@ class BlitzerDatasetDomain(Enum):
         file = open(self.getTrainFileFullPath())
         for line in file:
             count += 1
+        file.close()
         return count
         
     def getNumOfTestInstanceInDomain(self):
@@ -73,5 +75,6 @@ class BlitzerDatasetDomain(Enum):
         file = open(self.getTestFileFullPath())
         for line in file:
             count += 1
+        file.close()
         return count
     
