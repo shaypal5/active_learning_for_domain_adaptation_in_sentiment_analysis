@@ -76,5 +76,5 @@ def generateTestAndTrainSet(domain):
     testFile.flush()
     testFile.close()
 
-for domain in BlitzerDatasetDomain:
-    generateTestAndTrainSet(domain)
+#for domain in BlitzerDatasetDomain:
+#    generateTestAndTrainSet(domain)

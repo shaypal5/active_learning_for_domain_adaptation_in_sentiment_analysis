@@ -17,8 +17,8 @@ from sklearn.svm import LinearSVC
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
-sourceDomain = BlitzerDatasetDomain.jewelry
-targetDomain = BlitzerDatasetDomain.electronics
+sourceDomain = BlitzerDatasetDomain.electronics
+targetDomain = BlitzerDatasetDomain.camera
 print("")
 print("")
 print("")
