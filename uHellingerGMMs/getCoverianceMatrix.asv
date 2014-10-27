@@ -1,0 +1,28 @@
+function [ output_args ] = getCoverianceMatrix( dimension, diff)
+% get a random covariance matrix covMat from inverse-wishart distribution.
+% the normal distribution diffiened by N([1,...,1]*diff, covMat) should be
+% different enough from the one diffined by N([0,...,0],I) according to Hellinger distance.
+% the function samples matrices from the inverse-wishart distribution until
+% it finds one that satisfies this criterion. The matrix is save to file.
+    DEFAULT_DIMENSION = 10
+    switch nargin
+        case 0
+           diff = 5;
+           dimension = DEFAULT_DIMENSION;
+        case 1
+           dimension = DEFAULT_DIMENSION;
+    end
+    
+    %sample a matrix from inverse-wishart
+    covMat = iwishrnd(eye(dimension), dimension);
+    
+    %create P0
+    pdf.w = (1);
+    pdf.Mu = zeros(1,dimension);
+    pdf.Cov = eye(dimension);
+    
+    %creat P1
+    pdf.w 
+    
+end
+
