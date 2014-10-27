@@ -55,10 +55,10 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTestYtarget = encoder.transform(testYtarget)
     
     # Package train and test sets
-    newTrainSource = (newTrainXsource, newTrainYsource)
-    newTestSource = (newTestXsource, newTestYsource)
-    newTrainTarget = (newTrainXtarget, newTrainYtarget)
-    newTestTarget = (newTestXtarget, newTestYtarget)
+    newTrainSource = testActiveLearner.ActiveLearnerTester.dataType(newTrainXsource, newTrainYsource)
+    newTestSource = testActiveLearner.ActiveLearnerTester.dataType(newTestXsource, newTestYsource)
+    newTrainTarget = testActiveLearner.ActiveLearnerTester.dataType(newTrainXtarget, newTrainYtarget)
+    newTestTarget = testActiveLearner.ActiveLearnerTester.dataType(newTestXtarget, newTestYtarget)
     
     # Package domains
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
