@@ -22,19 +22,23 @@ def countPosInFile(filePath):
     file.close()
     return total,posNum
 
-def generateTestAndTrainSet(domain):
+def generateTestAndTrainSet(domain,specificBalancedFile = 0):
+    if specificBalancedFile == 0:
+        balancedFilePath = domain.getBalancedFileFullPath()
+    else:
+        balancedFilePath = domain.getBalancedFileFullPath()+"."+str(specificBalancedFile)
     print("Generating test and train set for domain %s" % domain.value)
     TRAIN_PERCENT = 0.7
     trainSet = []
     testSet = []
-    total, posNum = countPosInFile(domain.getBalancedFileFullPath())
+    total, posNum = countPosInFile(balancedFilePath)
     negNum = total - posNum
     print("Data file contains a total of "+str(total)+" instances.")
     print("Of those "+str(posNum)+" are labeled Positive and "+str(negNum)+" are labeled Negative.")
     
     posCount = 0
     negCount = 0    
-    file = open(domain.getBalancedFileFullPath())
+    file = open(balancedFilePath)
     
     for line in file:
         #print("here 0")

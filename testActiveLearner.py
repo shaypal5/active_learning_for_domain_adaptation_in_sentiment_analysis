@@ -17,8 +17,8 @@ from sklearn.svm import LinearSVC
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
-sourceDomain = BlitzerDatasetDomain.electronics
-targetDomain = BlitzerDatasetDomain.camera
+sourceDomain = BlitzerDatasetDomain.video
+targetDomain = BlitzerDatasetDomain.dvd
 print("")
 print("")
 print("")
