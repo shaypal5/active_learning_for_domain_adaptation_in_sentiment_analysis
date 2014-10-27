@@ -39,7 +39,25 @@ def getTrainAndTestData(P0, P1, numOfOverallSamples, trainPortion = 0.7, P0porti
     data = collections.namedtuple('data', ['train', 'test'])
     return data(train, test)
 
-def main():
+def getKLdistance(P0, P1):
+    cov0 = P0.getCovariance()
+    mu0 = P0.getMu()
+    
+    cov1 = P1.getCovariance()
+    mu1 = P1.getMu()
+    
+    d = len(cov1)
+    invCov0 = np.linalg.inv(cov0)
+    logDeterminant = math.log(np.linalg.det(cov0)/np.linalg.det(cov1))
+    traceSigmas = np.trace(np.dot(invCov0, cov1))
+    muDiff = mu0 - mu1
+    muDiffTrans = np.transpose(muDiff)
+    lastTerm = np.dot(np.dot(muDiffTrans, invCov0),muDiff)
+    
+    kl = 0.5 * (logDeterminant - d + traceSigmas + lastTerm)
+    return kl
+
+def main(): 
     n = 10
     numOfSamples = 7
     
@@ -54,10 +72,13 @@ def main():
     #generate P(X|Y=1) and P(X|Y=0) for target domain
     dist = dataSimulator.generateTargetDistributions(sourceP0, sourceP1)
     targetP0 = dist.P0; targetP1 = dist.P1
+    
+    KL0 = getKLdistance(sourceP0, targetP0)
+    KL1 = getKLdistance(sourceP1, targetP1)
+    print(KL1)
         
     targetData = getTrainAndTestData(targetP0, targetP1, 100)
     sourceData = getTrainAndTestData(sourceP0, sourceP1, 100)
-    
     
     
     
