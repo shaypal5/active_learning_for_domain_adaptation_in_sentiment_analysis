@@ -14,10 +14,7 @@ from sklearn.preprocessing import LabelEncoder
 
 def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     
-    print("")
-    print("")
-    print("")
-    print("")
+    print("\n\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
     print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.value, sourceDomain.getNumOfTotalInstanceInDomain(), sourceDomain.getNumOfTrainInstanceInDomain(), sourceDomain.getNumOfTestInstanceInDomain() ))
     print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.value, targetDomain.getNumOfTotalInstanceInDomain(), targetDomain.getNumOfTrainInstanceInDomain(), targetDomain.getNumOfTestInstanceInDomain() ))    

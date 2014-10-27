@@ -8,6 +8,9 @@ Created on Sun Oct 26 21:34:37 2014
 import simulateGaussianDomains as dataSimulator
 import numpy as np
 import collections
+import testActiveLearner
+from sklearn.feature_extraction import DictVectorizer
+from sklearn.preprocessing import LabelEncoder
 
 def getData(P0, P1, numOfSamples, P0portion):
     numOfNegSamples = round(numOfSamples * P0portion)
@@ -24,7 +27,7 @@ def getData(P0, P1, numOfSamples, P0portion):
     return data(X, Y)
     
 
-def getTrainAndTestData(P0, P1, numOfOverallSamples, trainPortion = 0.7, P0portion = 0.5):
+def getTrainAndTestData(domain, P0, P1, numOfOverallSamples, trainPortion = 0.7, P0portion = 0.5):
     '''
     generate train and test data from positive distribution P1 and negative P0.
     numOfOverallSamples is the number of samples in train and test sets, from both classes
@@ -36,8 +39,8 @@ def getTrainAndTestData(P0, P1, numOfOverallSamples, trainPortion = 0.7, P0porti
     train = getData(P0, P1, trainSize, P0portion)
     test = getData(P0, P1, testSize, P0portion)
     
-    data = collections.namedtuple('data', ['train', 'test'])
-    return data(train, test)
+    domainType = collections.namedtuple('domain', ['name', 'train', 'test'])
+    return domainType(domain,train, test)
 
 def getKLdistance(P0, P1):
     cov0 = P0.getCovariance()
@@ -56,6 +59,59 @@ def getKLdistance(P0, P1):
     
     kl = 0.5 * (logDeterminant - d + traceSigmas + lastTerm)
     return kl
+    
+def testActiveLearnersWithToyData(sourceData, targetData):
+    
+    print("\n\n\n\n")
+    print("Checking domain adaptation from source domain %s to target domain %s" % ('toySourceDomain', 'toyTargetDomain'))
+    
+    # Unpackaging train and test data for source domain
+    trainXsource = sourceData.train.X
+    trainYsource = sourceData.train.Y
+    testXsource = sourceData.test.X
+    testYsource = sourceData.test.Y
+    trainSourceSize = len(trainXsource)
+    vectorizer = DictVectorizer(dtype=float, sparse=True)
+    encoder = LabelEncoder()
+    
+    # Unpackaging train and test data for target domain
+    trainXtarget = targetData.train.X
+    trainYtarget = targetData.train.Y
+    testXtarget = targetData.test.X
+    testYtarget = targetData.test.Y
+    trainTargetSize = len(trainXtarget)
+    print(type(trainXsource))
+    
+    # Vectorize!
+    print("\nVectorizing train sets of source and target domains.")
+    vectorized = vectorizer.fit_transform(trainXsource+trainXtarget)
+    vectorizedLabels = encoder.fit_transform(trainYsource+trainYtarget)
+    total = trainSourceSize+trainTargetSize
+    numOfFeatures = vectorized[0].get_shape()[1]
+    print("Vectorizer num of features: %d" % numOfFeatures)
+    
+    # Split back to source and target
+    newTrainXsource = vectorized[0:trainSourceSize]
+    newTrainYsource = vectorizedLabels[0:trainSourceSize]
+    newTrainXtarget = vectorized[trainSourceSize+1:total]
+    newTrainYtarget = vectorizedLabels[trainSourceSize+1:total]
+    
+    # Vectorize test sets
+    newTestXsource = vectorizer.transform(testXsource)
+    newTestYsource = encoder.transform(testYsource)
+    newTestXtarget = vectorizer.transform(testXtarget)
+    newTestYtarget = encoder.transform(testYtarget)
+    
+    # Package train and test sets
+    newTrainSource = testActiveLearner.ActiveLearnerTester.dataType(newTrainXsource, newTrainYsource)
+    newTestSource = testActiveLearner.ActiveLearnerTester.dataType(newTestXsource, newTestYsource)
+    newTrainTarget = testActiveLearner.ActiveLearnerTester.dataType(newTrainXtarget, newTrainYtarget)
+    newTestTarget = testActiveLearner.ActiveLearnerTester.dataType(newTestXtarget, newTestYtarget)
+    
+    # Package domains
+    newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType('toySourceDomain', newTrainSource, newTestSource)
+    newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType('toyTargetDomain', newTrainTarget, newTestTarget)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
 
 def main(): 
     n = 10
@@ -75,12 +131,12 @@ def main():
     
     KL0 = getKLdistance(sourceP0, targetP0)
     KL1 = getKLdistance(sourceP1, targetP1)
-    print(KL1)
+    print("KL0: {0}, KL1: {1}".format(KL0, KL1))
         
-    targetData = getTrainAndTestData(targetP0, targetP1, 100)
-    sourceData = getTrainAndTestData(sourceP0, sourceP1, 100)
+    targetData = getTrainAndTestData('target', targetP0, targetP1, 100)
+    sourceData = getTrainAndTestData('source', sourceP0, sourceP1, 100)
     
-    
+    testActiveLearnersWithToyData(sourceData, targetData)
     
     
 if __name__ == '__main__':
