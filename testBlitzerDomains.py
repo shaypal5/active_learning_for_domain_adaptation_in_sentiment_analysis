@@ -6,11 +6,22 @@ Created on Mon Oct 27 11:14:31 2014
 """
 
 import parseProcessedDataFileForScikit
+import testActiveLearner
+from BlitzerDatasetDomain import BlitzerDatasetDomain
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
 def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
+    
+    print("")
+    print("")
+    print("")
+    print("")
+    print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
+    print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.value, sourceDomain.getNumOfTotalInstanceInDomain(), sourceDomain.getNumOfTrainInstanceInDomain(), sourceDomain.getNumOfTestInstanceInDomain() ))
+    print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.value, targetDomain.getNumOfTotalInstanceInDomain(), targetDomain.getNumOfTrainInstanceInDomain(), targetDomain.getNumOfTestInstanceInDomain() ))    
+    
     # Parsing train and test data for source domain
     trainXsource, trainYsource  = parseProcessedDataFileForScikit.parseDataFile(sourceDomain.getTrainFileFullPath())
     testXsource, testYsource = parseProcessedDataFileForScikit.parseDataFile(sourceDomain.getTestFileFullPath())
@@ -50,5 +61,9 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTestTarget = (newTestXtarget, newTestYtarget)
     
     # Package domains
-    newSourceDomain = (sourceDomain.value, newTrainSource, newTestSource)
-    newTargetDomain = (targetDomain.value, newTrainTarget, newTestTarget)
+    newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
+    newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
+    
+def testSomeSpecificCombination():
+    testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.apparel, BlitzerDatasetDomain.jewelry)
