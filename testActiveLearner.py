@@ -13,6 +13,8 @@ import ActiveLearner
 
 import collections
 from sklearn.svm import LinearSVC
+from scipy.sparse import csr_matrix
+from numpy import ndarray
 
 class ActiveLearnerTester:
     dataType = collections.namedtuple('data', ['X', 'Y'])
@@ -27,7 +29,14 @@ def testResultantClassifier(name, classifier, testSet):
     correct = 0
     wrong = 0
     
-    for i in range(testSet.Y.shape[0]):
+    if type(testSet.Y) == csr_matrix:
+        ysize = testSet.Y.shape[0]
+    elif type(testSet.Y) == ndarray:
+        ysize = testSet.Y.size
+    else:
+        raise ValueError("Unsupported data input.")
+    
+    for i in range(ysize):
         prediction = classifier.predict(testSet.X[i])
         if prediction == testSet.Y[i]:
             correct += 1
@@ -54,10 +63,19 @@ def testResultantClassifier(name, classifier, testSet):
 #each domain is a tuple of (name, train, test)
 def testActiveLearners(sourceDomain, targetDomain):
     
-    sourceTrainSize = sourceDomain.train.Y.shape[0]
-    sourceTestSize = sourceDomain.test.Y.shape[0]
-    targetTrainSize = targetDomain.train.Y.shape[0]
-    targetTestSize = targetDomain.test.Y.shape[0]
+    if type(sourceDomain.train.Y) == csr_matrix:
+        sourceTrainSize = sourceDomain.train.Y.shape[0]
+        sourceTestSize = sourceDomain.test.Y.shape[0]
+        targetTrainSize = targetDomain.train.Y.shape[0]
+        targetTestSize = targetDomain.test.Y.shape[0]
+    elif type(sourceDomain.train.Y) == ndarray:
+        sourceTrainSize = sourceDomain.train.Y.size
+        sourceTestSize = sourceDomain.test.Y.size
+        targetTrainSize = targetDomain.train.Y.size
+        targetTestSize = targetDomain.test.Y.size
+    else:
+        raise ValueError("Unsupported data input of type %s." % type(sourceDomain.train.Y))
+        
     
     print("\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.name, targetDomain.name))
@@ -70,7 +88,7 @@ def testActiveLearners(sourceDomain, targetDomain):
     print("(1) Testing Source Classifier: ")
     sourceClassifier = LinearSVC()
     sourceClassifier.fit(sourceDomain.train.X,sourceDomain.train.Y)
-    print("Source classifier was trained on %d labeled instances" % sourceDomain.train.Y.shape[0])
+    print("Source classifier was trained on %d labeled instances" % sourceTrainSize)
     sourceClassRes = testResultantClassifier('source_classifier', sourceClassifier, targetDomain.test)
     print("=================================================================================")
     
@@ -80,7 +98,7 @@ def testActiveLearners(sourceDomain, targetDomain):
     print("(2) Testing Target classifier: ")
     targetClassifier = LinearSVC()
     targetClassifier.fit(targetDomain.train.X,targetDomain.train.Y)
-    print("target classifier was trained on %d labeled instances" % targetDomain.train.Y.shape[0])
+    print("target classifier was trained on %d labeled instances" % targetTrainSize)
     targetClassRes = testResultantClassifier('target_classifier', targetClassifier, targetDomain.test)
     print("=================================================================================")
     

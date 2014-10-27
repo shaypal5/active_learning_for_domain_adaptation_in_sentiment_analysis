@@ -4,6 +4,7 @@ Created on Sat Oct 18 17:49:48 2014
 
 @author: Inbar
 """
+import numpy as np
 import scipy.sparse as sp
 import operator
 import random
@@ -47,6 +48,14 @@ class SampleSelector:
                 bestScoreIndices = [ind]
             
         return [[batch,batchLabels],indexList]
+        
+    def batchAppend(self, batch, toAdd):
+        if type(batch) == sp.csr_matrix:
+            return sp.vstack([batch, toAdd])
+        elif type(batch) == np.ndarray:
+            return np.append(batch, toAdd)
+        else:
+            raise ValueError("Unsupported data input of type %s." % type(batch))
     
     def addSamplesToBatch(self, batch, batchLabels, bestScoreIndices, samplesPool, batchSize, indexList, currClassifier):
         samples = samplesPool[0]
@@ -58,7 +67,7 @@ class SampleSelector:
             #add all samples
             for i in range(len(bestScoreIndices)):
                 ind = bestScoreIndices[i]
-                batch = sp.vstack([batch, samples[ind]])
+                batch = self.batchAppend(batch,samples[ind])                    
                 batchLabels.append(labels[ind])
                 indexList.append(ind)            
         else:
@@ -67,7 +76,8 @@ class SampleSelector:
                 randomIndices = random.sample(set(bestScoreIndices), numOfNeededSamples)
                 for i in range(len(randomIndices)):
                     ind = randomIndices[i]
-                    batch = sp.vstack([batch, samples[ind]])
+                    #batch = sp.vstack([batch, samples[ind]])
+                    batch = self.batchAppend(batch,samples[ind])  
                     batchLabels.append(labels[ind])
                     indexList.append(ind)
             else:
@@ -78,14 +88,16 @@ class SampleSelector:
                 indexMapping = {}
                 for i in range(1, len(bestScoreIndices)):
                     ind = bestScoreIndices[i]
-                    tmpBatch = sp.vstack([batch, samples[ind]])
+                    #tmpBatch = sp.vstack([batch, samples[ind]])                    
+                    tmpBatch = self.batchAppend(batch,samples[ind]) 
                     tmpBatchLabels.append(labels[ind])
                     indexMapping[i] = ind
                 result = UncertaintySampleSelector.selectSamples(currClassifier,[tmpBatch, tmpBatchLabels],numOfNeededSamples)
                 newIndices = result[1]
                 for i in range(len(newIndices)):
                    ind = indexMapping[newIndices[i]]
-                   batch = sp.vstack([batch, samples[ind]])
+                   #batch = sp.vstack([batch, samples[ind]])
+                   batch = self.batchAppend(batch,samples[ind])  
                    batchLabels.append(labels[ind])
                    indexList.append(ind)                               
                

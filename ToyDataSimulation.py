@@ -9,8 +9,10 @@ import simulateGaussianDomains as dataSimulator
 import numpy as np
 import collections
 import testActiveLearner
+import math
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
+from scipy.sparse import csr_matrix
 
 def getData(P0, P1, numOfSamples, P0portion):
     numOfNegSamples = round(numOfSamples * P0portion)
@@ -59,6 +61,15 @@ def getKLdistance(P0, P1):
     
     kl = 0.5 * (logDeterminant - d + traceSigmas + lastTerm)
     return kl
+
+def ndarrayDatasetToSparseMatrices(dataset):
+    newSet = []
+    for inst in dataset:
+        newSet.append(csr_matrix(inst))
+    newSetNdarray = np.asarray(newSet)
+    newSetMat = np.matrix(newSetNdarray, dtype = csr_matrix)
+    newSetCsrMat = csr_matrix(newSetMat)
+    return newSetMat
     
 def testActiveLearnersWithToyData(sourceData, targetData):
     
@@ -81,11 +92,12 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     testYtarget = targetData.test.Y
     trainTargetSize = len(trainXtarget)
     print(type(trainXsource))
-    
+
+    '''    
     # Vectorize!
     print("\nVectorizing train sets of source and target domains.")
-    vectorized = vectorizer.fit_transform(trainXsource+trainXtarget)
-    vectorizedLabels = encoder.fit_transform(trainYsource+trainYtarget)
+    vectorized = vectorizer.fit_transform(np.append(trainXsource, trainXtarget, axis = 0))
+    vectorizedLabels = encoder.fit_transform(np.append(trainYsource, trainYtarget, axis = 0))
     total = trainSourceSize+trainTargetSize
     numOfFeatures = vectorized[0].get_shape()[1]
     print("Vectorizer num of features: %d" % numOfFeatures)
@@ -101,6 +113,29 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     newTestYsource = encoder.transform(testYsource)
     newTestXtarget = vectorizer.transform(testXtarget)
     newTestYtarget = encoder.transform(testYtarget)
+      
+    
+    newTrainXsource = ndarrayDatasetToSparseMatrices(trainXsource)
+    newTrainYsource = ndarrayDatasetToSparseMatrices(trainYsource)
+    newTrainXtarget = ndarrayDatasetToSparseMatrices(trainXtarget)
+    newTrainYtarget = ndarrayDatasetToSparseMatrices(trainYtarget)
+    
+    # Vectorize test sets
+    newTestXsource = ndarrayDatasetToSparseMatrices(testXsource)
+    newTestYsource = ndarrayDatasetToSparseMatrices(testYsource)
+    newTestXtarget = ndarrayDatasetToSparseMatrices(testXtarget)
+    newTestYtarget = ndarrayDatasetToSparseMatrices(testYtarget)
+
+    '''
+    
+    newTrainXsource = trainXsource
+    newTrainYsource = np.asarray(trainYsource)
+    newTrainXtarget = trainXtarget
+    newTrainYtarget = np.asarray(trainYtarget)
+    newTestXsource = testXsource
+    newTestYsource = np.asarray(testYsource)
+    newTestXtarget = testXtarget
+    newTestYtarget = np.asarray(testYtarget)
     
     # Package train and test sets
     newTrainSource = testActiveLearner.ActiveLearnerTester.dataType(newTrainXsource, newTrainYsource)
@@ -114,7 +149,7 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
 
 def main(): 
-    n = 10
+    n = 100
     numOfSamples = 7
     
     #generate P(X|Y=1) and P(X|Y=0) for source domain

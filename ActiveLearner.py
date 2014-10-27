@@ -7,9 +7,8 @@ Created on Tue Oct 14 17:01:10 2014
 
 import sys
 from sklearn.svm import LinearSVC
-import scipy
 import scipy.sparse as sps
-import numpy
+import numpy as np
 
 class ActiveLearner:
     
@@ -33,6 +32,14 @@ class ActiveLearner:
         self.max_num_of_iterations = maxIterations
         self.batch_size = batchSize
         
+    def robustAppend(self, batch, toAdd):
+        if type(batch) == sps.csr_matrix:
+            return sps.vstack([batch, toAdd])
+        elif type(batch) == np.ndarray:
+            return np.append(batch, toAdd)
+        else:
+            raise ValueError("Unsupported data input of type %s." % type(batch))
+        
     def train(self, sourceClassifier, sourceTrainData, targetTrainData):        
         targetClassifier = sourceClassifier
 
@@ -51,7 +58,8 @@ class ActiveLearner:
  #               firstIteration = 0
  #               targetTrainData = [selectedSamples[0], selectedSamples[1]]
  #           else:
-            targetTrainData[0] = scipy.sparse.vstack([targetTrainData[0], selectedSamples[0]])
+            
+            targetTrainData[0] = self.robustAppend(targetTrainData[0], selectedSamples[0])
             targetTrainData[1] = targetTrainData[1] + selectedSamples[1]
             unusedTargetData = self.getNewUnusedData(unusedTargetData,selectedIndices)
             targetClassifier = LinearSVC()
@@ -64,8 +72,11 @@ class ActiveLearner:
     def getNewUnusedData(self, unused, selectedIndices):
         unusedInst = unused[0]
         unusedLabels = unused[1]
-        ndarr = unusedInst.toarray()
-        ndarr = numpy.delete(ndarr,selectedIndices,axis=0)
+        if type(unusedInst) != np.ndarray:
+            ndarr = unusedInst.toarray()
+        else:
+            ndarr = unusedInst
+        ndarr = np.delete(ndarr,selectedIndices,axis=0)
         newUnusedInst = sps.csr_matrix(ndarr)
         newUnusedLabels = [unusedLabels[i] for i in range(len(unusedLabels)) if i not in selectedIndices]
         return [newUnusedInst,newUnusedLabels]

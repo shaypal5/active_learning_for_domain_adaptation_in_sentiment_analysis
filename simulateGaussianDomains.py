@@ -38,7 +38,7 @@ def generateSourceDistributions(dimension):
     generate multivariate gaussian distributions, for specific dimension
     '''
     MATRIX_VARIABLE_NAME = 'W'
-    covarianceMatrixFile = 'C:\\Users\\inbar\\Dropbox\\1 - MSc\\Modern Statistical Data Analysis\\Final Project\\W.mat'
+    covarianceMatrixFile = 'uHellingerGMMs\\W.mat'
     meansDiff = 4
     
     #set parameters for Y=0 distribution

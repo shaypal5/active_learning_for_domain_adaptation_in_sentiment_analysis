@@ -24,3 +24,5 @@ def countDomainLines(domain):
     print(domain.value + ' has '+str(count)+' instances.')
     file.close()
     return count
+    
+countAllDomainLines()

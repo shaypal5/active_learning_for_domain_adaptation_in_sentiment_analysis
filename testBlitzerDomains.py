@@ -38,6 +38,8 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     total = trainSourceSize+trainTargetSize
     numOfFeatures = vectorized[0].get_shape()[1]
     print("Vectorizer num of features: %d" % numOfFeatures)
+    print("data set type is %s" % type(vectorized))
+    print("data set instance is %s" % type(vectorized[3]))
     
     # Split back to source and target
     newTrainXsource = vectorized[0:trainSourceSize]
@@ -50,6 +52,7 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTestYsource = encoder.transform(testYsource)
     newTestXtarget = vectorizer.transform(testXtarget)
     newTestYtarget = encoder.transform(testYtarget)
+    print("testY type is %s" % type(newTestYtarget))
     
     # Package train and test sets
     newTrainSource = testActiveLearner.ActiveLearnerTester.dataType(newTrainXsource, newTrainYsource)
@@ -63,4 +66,6 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
     
 def testSomeSpecificCombination():
-    testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.apparel, BlitzerDatasetDomain.jewelry)
+    testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.videogames)
+
+testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.videogames)
