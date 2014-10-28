@@ -5,9 +5,23 @@ Created on Sat Oct 18 17:49:48 2014
 @author: Inbar
 """
 import scipy.sparse as sp
+import numpy as np
 import operator
 
 class SampleSelector:
+    
+    def robustAppend(self, batch, toAdd):
+        print("In SampleSelector.robustAppend")
+        if type(batch) == sp.csr_matrix:
+            return sp.vstack([batch, toAdd])
+        elif type(batch) == np.ndarray:
+            print("In SampleSelector.robustAppend with batch.shape[0] = %d and toAdd.shape[0] = %d" % (batch.shape[0],toAdd.shape[0]))
+            print(batch.shape)
+            print(toAdd.shape)
+            print(toAdd)
+            return np.append(batch, toAdd, axis = 0)
+        else:
+            raise ValueError("Unsupported data input of type %s." % type(batch))
     
     def selectHighestRatedSamples(self, samplesRating, samplesPool, batchSize):
         samples = samplesPool[0]
@@ -22,6 +36,7 @@ class SampleSelector:
                 count += 1
                 sampleTuple = sortedSamplesRating[i]
                 ind = sampleTuple[0]
+                print("type(ind) = %s" % type(ind))
                 #print("first ind = "+str(ind))
                 batch = samples[ind]#TODO create csr_matrix
                 #print(len(labels))
@@ -31,7 +46,8 @@ class SampleSelector:
             if count < batchSize:
                 sampleTuple = sortedSamplesRating[i]
                 ind = sampleTuple[0]
-                batch = sp.vstack([batch, samples[ind]])
+                #batch = sp.vstack([batch, samples[ind]])
+                batch = self.robustAppend(batch, samples[ind])
                 batchLabels.append(labels[ind])
                 indexList.append(ind)
             else:

@@ -52,13 +52,34 @@ def testResultantClassifier(name, classifier, testSet):
                 FN += 1
     
     print("TP: {0} FP: {1} TN: {2} FN: {3}".format(TP, FP, TN, FN))
-    precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
-    recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
-    accuracy = (TP + TN) / (TP + TN + FP + FN)
+    if (TP+FP) > 0:
+        precision = TP / (TP + FP) #out of all the examples the classifier labeled as positive, what fraction were correct?
+    else:
+        precision = 0
+    if (TP+FN) > 0:
+        recall = TP / (TP + FN) #out of all the positive examples there were, what fraction did the classifier pick up?
+    else:
+        recall = 0
+    if (TP + TN + FP + FN) > 0:
+        accuracy = (TP + TN) / (TP + TN + FP + FN)
+    else:
+        accuracy = 0
     print("precision: {0}  recall: {1}  accuracy: {2}".format(precision, recall, accuracy))
     print("correct: {0}, wrong: {1}".format(correct, wrong))
     thisResult = ActiveLearnerTester.resultsType(name, correct, wrong, TP, FP, TN, FN, precision, recall, accuracy)
     return thisResult
+    
+    '''
+def checkSizes(self, trainData, testData):
+    trainXlen = self.getLength(trainData.X)
+    sourceYlen = self.getLength(trainData.Y)
+    if sourceXlen != sourceYlen:
+        raise ValueError("Source train has %d samples in X but %d in Y." % (sourceXlen, sourceYlen))
+    targetXlen = self.getLength(targetTrainData[0])
+    targetYlen = self.getLength(targetTrainData[1])
+    if targetXlen != targetYlen:
+        raise ValueError("Target train has %d samples in X but %d in Y." % (targetXlen, targetYlen))
+        '''
 
 #each domain is a tuple of (name, train, test)
 def testActiveLearners(sourceDomain, targetDomain):

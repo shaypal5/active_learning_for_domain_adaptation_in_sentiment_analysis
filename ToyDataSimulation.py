@@ -19,9 +19,11 @@ def getData(P0, P1, numOfSamples, P0portion):
     numOfPosSamples = numOfSamples - numOfNegSamples
     
     posSamples = P1.getSamples(numOfPosSamples)
-    negSamples = P0.getSamples(numOfNegSamples)    
+    negSamples = P0.getSamples(numOfNegSamples)
     
     X = np.append(posSamples, negSamples, axis = 0)
+    print("X.size = %d" % X.size)
+    print(X.shape)
     Ypos = [1] * numOfPosSamples ; Yneg = [0] * numOfNegSamples
     Y = Ypos + Yneg
     
@@ -150,7 +152,8 @@ def testActiveLearnersWithToyData(sourceData, targetData):
 
 def main(): 
     n = 100
-    numOfSamples = 7
+    numOfSourceSamples = 500 #train = 350
+    numOfTargetSamples = 600 # train = 420
     
     #generate P(X|Y=1) and P(X|Y=0) for source domain
     dist = dataSimulator.generateSourceDistributions(n)
@@ -168,8 +171,8 @@ def main():
     KL1 = getKLdistance(sourceP1, targetP1)
     print("KL0: {0}, KL1: {1}".format(KL0, KL1))
         
-    targetData = getTrainAndTestData('target', targetP0, targetP1, 100)
-    sourceData = getTrainAndTestData('source', sourceP0, sourceP1, 100)
+    targetData = getTrainAndTestData('target', targetP0, targetP1, numOfSourceSamples)
+    sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfTargetSamples)
     
     testActiveLearnersWithToyData(sourceData, targetData)
     

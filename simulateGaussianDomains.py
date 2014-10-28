@@ -30,7 +30,10 @@ class multivariateGaussian:
         self.covarianceMatrix = covarianceMatrix
     
     def getSamples(self, numOfSamples = 1):
-        return np.random.multivariate_normal(self.mu, self.covarianceMatrix, numOfSamples)
+        data = np.random.multivariate_normal(self.mu, self.covarianceMatrix, numOfSamples)
+        #print("In multivariateGaussian.getSamples data.size = %d" % data.size)
+        #print(data.shape)
+        return data
 
 
 def generateSourceDistributions(dimension):
