@@ -18,13 +18,13 @@ class SampleSelector:
         self.randomTieBreaker = 1
     
     def robustAppend(self, batch, toAdd):
-        print("In SampleSelector.robustAppend")
+        #print("In SampleSelector.robustAppend")
         if type(batch) == sp.csr_matrix:
             return sp.vstack([batch, toAdd])
         elif type(batch) == np.ndarray:
-            print("In SampleSelector.robustAppend with batch.shape[0] = %d and toAdd.shape[0] = %d" % (batch.shape[0],toAdd.shape[0]))
-            print(batch.shape)
-            print(toAdd.shape)
+            #print("In SampleSelector.robustAppend with batch.shape[0] = %d and toAdd.shape[0] = %d" % (batch.shape[0],toAdd.shape[0]))
+            #print(batch.shape)
+            #print(toAdd.shape)
             #print(toAdd)
             return np.append(batch, np.array([toAdd]), axis = 0)
         else:
@@ -65,7 +65,7 @@ class SampleSelector:
                 bestAvailableScore = sampleScore
                 bestScoreIndices = [ind]
         
-        print("selectHighestRatedSamples returns type(batch) = %s" %type(batch))
+        #print("selectHighestRatedSamples returns type(batch) = %s" %type(batch))
         return [[batch,batchLabels],indexList]
     
     def addSamplesToBatch(self, batch, batchLabels, bestScoreIndices, samplesPool, batchSize, indexList, currClassifier):
@@ -116,5 +116,5 @@ class SampleSelector:
                    batch = self.robustAppend(batch,samples[ind])  
                    batchLabels.append(labels[ind])
                    indexList.append(ind)                               
-        print("addSamplesToBatch returns type(batch) = %s" %type(batch))
+        #print("addSamplesToBatch returns type(batch) = %s" %type(batch))
         return [batch, batchLabels, indexList]

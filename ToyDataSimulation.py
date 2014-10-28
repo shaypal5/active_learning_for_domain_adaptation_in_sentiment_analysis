@@ -152,8 +152,8 @@ def testActiveLearnersWithToyData(sourceData, targetData):
 
 def main(): 
     n = 100
-    numOfSourceSamples = 500 #train = 350
-    numOfTargetSamples = 600 # train = 420
+    numOfSourceSamples = 1500 #train = 350
+    numOfTargetSamples = 3600 # train = 420
     
     #generate P(X|Y=1) and P(X|Y=0) for source domain
     dist = dataSimulator.generateSourceDistributions(n)

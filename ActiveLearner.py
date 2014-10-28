@@ -38,9 +38,9 @@ class ActiveLearner:
         elif type(batch) == np.ndarray:
             if type(toAdd) != np.ndarray:
                 print("type(toAdd) = %s" % type(toAdd))
-            print("In ActiveLearner.robustAppend with batch.shape[0] = %d and toAdd.shape[0] = %d" % (batch.shape[0],toAdd.shape[0]))
-            print(batch.shape)
-            print(toAdd.shape)
+            #print("In ActiveLearner.robustAppend with batch.shape[0] = %d and toAdd.shape[0] = %d" % (batch.shape[0],toAdd.shape[0]))
+            #print(batch.shape)
+            #print(toAdd.shape)
             #print(toAdd)
             return np.append(batch, toAdd, axis = 0)
         else:
@@ -82,13 +82,13 @@ class ActiveLearner:
  #               targetTrainData = [selectedSamples[0], selectedSamples[1]]
  #           else:
             
-            print("type(selectedSamples) = %s" % type(selectedSamples[0]))
-            print("targetTrainData[0].shape[0] = %d" % targetTrainData[0].shape[0])
+            #print("type(selectedSamples) = %s" % type(selectedSamples[0]))
+            #print("targetTrainData[0].shape[0] = %d" % targetTrainData[0].shape[0])
             targetTrainData[0] = self.robustAppend(targetTrainData[0], selectedSamples[0])
             targetTrainData[1] = targetTrainData[1] + selectedSamples[1]
             unusedTargetData = self.getNewUnusedData(unusedTargetData,selectedIndices)
             targetClassifier = LinearSVC()
-            print("targetTrainData[0].shape[0] = %d" % targetTrainData[0].shape[0])
+            #print("targetTrainData[0].shape[0] = %d" % targetTrainData[0].shape[0])
             targetClassifier.fit(targetTrainData[0],targetTrainData[1])
             i += 1
         
