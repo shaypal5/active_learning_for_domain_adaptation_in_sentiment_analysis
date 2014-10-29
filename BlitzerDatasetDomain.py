@@ -40,6 +40,8 @@ class BlitzerDatasetDomain(Enum):
             return('C:/Users/inbar/Documents/Modern Statistical Data Analysis/sorted_data/')
         if (socket.gethostname() == 'Shay-Lenovo-Lap'):
             return('C:/OrZuk/Data/sorted_data/')
+        if (socket.gethostname() == 'ShayPalachy-PC'):
+            return('C:/OrZuk/Data/sorted_data/')
         return None
         
     def getDomainPath(self):
