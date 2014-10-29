@@ -41,12 +41,12 @@ def generateSourceDistributions(dimension):
     generate multivariate gaussian distributions, for specific dimension
     '''
     MATRIX_VARIABLE_NAME = 'W'
-    covarianceMatrixFile = 'uHellingerGMMs\\W.mat'
-    meansDiff = 4
+    covarianceMatrixFile = 'uHellingerGMMs\\W0959d12diff11.mat'
+    meansDiff = 1.1
     
     #set parameters for Y=0 distribution
     covMat0 = np.identity(dimension)
-    mu0 = np.zeros(dimension)
+    mu0 = np.ones(dimension)
 
     #set parmeters for Y=1 distribution
     covMat1 = scipy.io.loadmat(covarianceMatrixFile)
@@ -64,15 +64,17 @@ def generateTargetDistributions(sourceP0, sourceP1):
     '''
     generate target distribution according to source distribution
     '''
+    alpha = 0.8;
+    
     dimension = len(sourceP0.getMu())
-    rotationMatrix = xalglib.rmatrixrndorthogonal(dimension)
+    rotationMatrix = xalglib.rmatrixrndorthogonal(dimension)    
     
     targetP0 = multivariateGaussian( 
-        np.dot(sourceP0.getMu(), rotationMatrix),  
-        np.dot(np.dot(rotationMatrix, sourceP0.getCovariance()) , np.transpose(rotationMatrix)))        
+        np.add(np.multiply(alpha,sourceP0.getMu()), np.multiply((1-alpha),np.dot(sourceP0.getMu(), rotationMatrix))),  
+        np.add((np.multiply(alpha, sourceP0.getCovariance())),np.multiply((1- alpha), np.dot(np.dot(rotationMatrix, sourceP0.getCovariance()) , np.transpose(rotationMatrix)))))        
     targetP1 = multivariateGaussian( 
-        np.dot(sourceP1.getMu(), rotationMatrix),  
-        np.dot(np.dot(rotationMatrix, sourceP1.getCovariance()) , np.transpose(rotationMatrix)))
+        np.add(np.multiply(alpha,sourceP1.getMu()), np.multiply((1-alpha),np.dot(sourceP1.getMu(), rotationMatrix))),  
+        np.add((np.multiply(alpha, sourceP1.getCovariance())),np.multiply((1- alpha), np.dot(np.dot(rotationMatrix, sourceP1.getCovariance()) , np.transpose(rotationMatrix)))))        
     
     distributions = collections.namedtuple('Distributions', ['P0', 'P1'])
     return distributions(targetP0, targetP1)

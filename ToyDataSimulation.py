@@ -151,7 +151,7 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
 
 def main(): 
-    n = 100
+    n = 120
     numOfSourceSamples = 1500 #train = 350
     numOfTargetSamples = 3600 # train = 420
     
@@ -171,8 +171,8 @@ def main():
     KL1 = getKLdistance(sourceP1, targetP1)
     print("KL0: {0}, KL1: {1}".format(KL0, KL1))
         
-    targetData = getTrainAndTestData('target', targetP0, targetP1, numOfSourceSamples)
-    sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfTargetSamples)
+    targetData = getTrainAndTestData('target', targetP0, targetP1, numOfTargetSamples)
+    sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfSourceSamples)
     
     testActiveLearnersWithToyData(sourceData, targetData)
     
