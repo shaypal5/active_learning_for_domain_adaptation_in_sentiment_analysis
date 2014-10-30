@@ -113,6 +113,7 @@ def testActiveLearners(sourceDomain, targetDomain):
     sourceClassRes = testResultantClassifier('source_classifier', sourceClassifier, targetDomain.test)
     print("=================================================================================")
     
+    '''
     #train classifier on target domain
     print("\n\n\n")
     print("=================================================================================")
@@ -122,16 +123,19 @@ def testActiveLearners(sourceDomain, targetDomain):
     print("target classifier was trained on %d labeled instances" % targetTrainSize)
     targetClassRes = testResultantClassifier('target_classifier', targetClassifier, targetDomain.test)
     print("=================================================================================")
+    '''
     
     print("\n\n\n")
     print("=================================================================================") 
-    print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")    
-    selector = UncertaintySampleSelector()
-    learner = ActiveLearner.ActiveLearner(selector)
-    uncertaintyClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
-    uncertaintyClassRes = testResultantClassifier('uncertainty_classifier', uncertaintyClassifier, targetDomain.test)
-    print("=================================================================================")
+    print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")
+    for numOfIter in range(40,51,5):
+        selector = UncertaintySampleSelector()
+        learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, 10)
+        uncertaintyClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
+        uncertaintyClassRes = testResultantClassifier('uncertainty_classifier', uncertaintyClassifier, targetDomain.test)
+        print("=================================================================================")
 
+    '''
     print("\n\n\n")
     print("=================================================================================")   
     print("(4) Testing Active Learning classifier with *Query By Partial Data Commitee* sample selector: ") 
@@ -149,5 +153,6 @@ def testActiveLearners(sourceDomain, targetDomain):
     targetSourceQBCClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
     targetSourceQBCClassRes = testResultantClassifier('partial_committee_classifier', targetSourceQBCClassifier, targetDomain.test)
     print("=================================================================================")
+    '''    
     
     print("Test done")

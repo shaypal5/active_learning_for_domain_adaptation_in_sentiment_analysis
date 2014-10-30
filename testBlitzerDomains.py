@@ -66,6 +66,6 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
     
 def testSomeSpecificCombination():
-    testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.videogames)
+    testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)
 
-testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.videogames)
+testSomeSpecificCombination()

@@ -92,7 +92,7 @@ class ActiveLearner:
             targetClassifier.fit(targetTrainData[0],targetTrainData[1])
             i += 1
         
-        print("active learner was trained on {0} labeled instances.".format(self.DEFAULT_BATCH_SIZE*self.DEFAULT_NUM_OF_ITERATIONS))
+        print("active learner was trained on {0} labeled instances.".format(self.batch_size * self.max_num_of_iterations))
         return targetClassifier
         
     def getNewUnusedData(self, unused, selectedIndices):
