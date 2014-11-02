@@ -148,7 +148,15 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     # Package domains
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType('toySourceDomain', newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType('toyTargetDomain', newTrainTarget, newTestTarget)
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
+    
+    #Set run parameters
+    runTarget = True
+    runUncertainty = True
+    runPartialQBC = False
+    runSTQBC = False
+    batchSize = 10
+    batchRange = [10,15,20]
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
 
 def main(): 
     n = 100

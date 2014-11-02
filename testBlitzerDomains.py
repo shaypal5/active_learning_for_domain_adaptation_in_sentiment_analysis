@@ -12,7 +12,7 @@ from BlitzerDatasetDomain import BlitzerDatasetDomain
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
-def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
+def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, batchSize = 10, batchRange = [20]):
     
     print("\n\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
@@ -63,10 +63,10 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     # Package domains
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
-    testActiveLearnersWithBlitzerDomains(source, target)
+    testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
-testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)
+testSomeSpecificCombination(BlitzerDatasetDomain.cellphones, BlitzerDatasetDomain.gourmet)

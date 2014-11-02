@@ -5,7 +5,7 @@ import numpy as np
 
 #Uncertainty selectr accuracy plot
 uncAcuPlt = plt.figure(1)
-uncAcuPlt.suptitle('Accuracy of Uncertainty Selection', fontsize=30)
+uncAcuPlt.suptitle('Accuracy of Uncertainty Selection', fontsize=14)
 values = [0,20,50,100,150,200,250,300,350,400,450,500]
 plt.plot(values, [0.7307 for i in range(12)], 'r--')
 plt.plot(values, [0.8876 for i in range(12)], 'b--')

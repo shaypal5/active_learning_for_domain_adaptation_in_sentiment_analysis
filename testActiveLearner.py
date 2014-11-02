@@ -82,7 +82,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain):
+def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, batchSize = 10, batchRange = [20]):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -113,47 +113,54 @@ def testActiveLearners(sourceDomain, targetDomain):
     sourceClassRes = testResultantClassifier('source_classifier', sourceClassifier, targetDomain.test)
     print("=================================================================================")
     
-    '''
     #train classifier on target domain
-    print("\n\n\n")
-    print("=================================================================================")
-    print("(2) Testing Target classifier: ")
-    targetClassifier = LinearSVC()
-    targetClassifier.fit(targetDomain.train.X,targetDomain.train.Y)
-    print("target classifier was trained on %d labeled instances" % targetTrainSize)
-    targetClassRes = testResultantClassifier('target_classifier', targetClassifier, targetDomain.test)
-    print("=================================================================================")
-    '''
-    
-    print("\n\n\n")
-    print("=================================================================================") 
-    print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")
-    for numOfIter in range(55,56,5):
-        print(numOfIter)
-        selector = UncertaintySampleSelector()
-        learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, 10)
-        uncertaintyClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
-        uncertaintyClassRes = testResultantClassifier('uncertainty_classifier', uncertaintyClassifier, targetDomain.test)
+    if runTarget:
+        print("\n\n\n")
         print("=================================================================================")
+        print("(2) Testing Target classifier: ")
+        targetClassifier = LinearSVC()
+        targetClassifier.fit(targetDomain.train.X,targetDomain.train.Y)
+        print("target classifier was trained on %d labeled instances" % targetTrainSize)
+        targetClassRes = testResultantClassifier('target_classifier', targetClassifier, targetDomain.test)
+        print("=================================================================================")
+    
+    #test UNCERTAINTY classifier
+    if runUncertainty:
+        print("\n\n\n")
+        print("=================================================================================") 
+        print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")
+        for numOfIter in batchRange:
+            print("With %d iterations of %d each" % (numOfIter,batchSize))
+            selector = UncertaintySampleSelector()
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            uncertaintyClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
+            uncertaintyClassRes = testResultantClassifier('uncertainty_classifier', uncertaintyClassifier, targetDomain.test)
+            print("=================================================================================")
 
-    '''
-    print("\n\n\n")
-    print("=================================================================================")   
-    print("(4) Testing Active Learning classifier with *Query By Partial Data Commitee* sample selector: ") 
-    selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
-    learner = ActiveLearner.ActiveLearner(selector)
-    partialComClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
-    partialComClassRes = testResultantClassifier('partial_committee_classifier', partialComClassifier, targetDomain.test)
-    print("=================================================================================")
+    #test PARTIAL QBC
+    if runPartialQBC:
+        print("\n\n\n")
+        print("=================================================================================")   
+        print("(4) Testing Active Learning classifier with *Query By Partial Data Commitee* sample selector: ") 
+        for numOfIter in batchRange:
+            print("With %d iterations of %d each" % (numOfIter,batchSize))
+            selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            partialComClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
+            partialComClassRes = testResultantClassifier('partial_committee_classifier', partialComClassifier, targetDomain.test)
+            print("=================================================================================")
 
-    print("\n\n\n")
-    print("=================================================================================") 
-    print("(5) Testing Active Learning classifier with *Target & Source QBC* sample selector: ") 
-    selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
-    learner = ActiveLearner.ActiveLearner(selector)
-    targetSourceQBCClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
-    targetSourceQBCClassRes = testResultantClassifier('partial_committee_classifier', targetSourceQBCClassifier, targetDomain.test)
-    print("=================================================================================")
-    '''    
+    #test TARGET & SOURCE QBC
+    if runSTQBC:
+        print("\n\n\n")
+        print("=================================================================================") 
+        print("(5) Testing Active Learning classifier with *Target & Source QBC* sample selector: ") 
+        for numOfIter in batchRange:
+            print("With %d iterations of %d each" % (numOfIter,batchSize))
+            selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            targetSourceQBCClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
+            targetSourceQBCClassRes = testResultantClassifier('partial_committee_classifier', targetSourceQBCClassifier, targetDomain.test)
+            print("=================================================================================")    
     
     print("Test done")
