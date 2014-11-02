@@ -67,6 +67,7 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget =
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
-    testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
+    testActiveLearnersWithBlitzerDomains(source, target)
+    #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
-testSomeSpecificCombination(BlitzerDatasetDomain.cellphones, BlitzerDatasetDomain.gourmet)
+testSomeSpecificCombination(BlitzerDatasetDomain.toys, BlitzerDatasetDomain.automotive)
