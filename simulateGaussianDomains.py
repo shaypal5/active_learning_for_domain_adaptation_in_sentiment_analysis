@@ -41,7 +41,7 @@ def generateSourceDistributions(dimension):
     generate multivariate gaussian distributions, for specific dimension
     '''
     MATRIX_VARIABLE_NAME = 'W'
-    covarianceMatrixFile = 'uHellingerGMMs\\W100.mat'
+    covarianceMatrixFile = 'uHellingerGMMs\\W1000.mat'
     meansDiff = 1.1
     
     #set parameters for Y=0 distribution
@@ -60,11 +60,10 @@ def generateSourceDistributions(dimension):
     return distributions(P0, P1)
     
     
-def generateTargetDistributions(sourceP0, sourceP1):
+def generateTargetDistributions(sourceP0, sourceP1, alpha=1):
     '''
     generate target distribution according to source distribution
     '''
-    alpha = 0.93;
     
     dimension = len(sourceP0.getMu())
     rotationMatrix = xalglib.rmatrixrndorthogonal(dimension)    

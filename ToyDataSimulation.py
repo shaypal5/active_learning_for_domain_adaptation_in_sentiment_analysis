@@ -156,10 +156,11 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     runSTQBC = False
     batchSize = 10
     batchRange = [10,15,20]
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
+    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
+    return results
 
 def main(): 
-    n = 100
+    n = 500
 #    numOfSourceSamples = 1500 #train = 350
 #    numOfTargetSamples = 3600 # train = 420
     numOfSourceSamples = 4000 #train = 350
@@ -172,21 +173,32 @@ def main():
     #check that the distribution are different enough
  #   bhCoeff = dataSimulator.getBhattacharyyaCoefficient(sourceP0, sourceP1)
  #   print(bhCoeff)
+    alphas = [1, 0.95, 0.9, 0.85, 0.8]
+    sourceAccuracy = []
+    targetAccuracy = []
+    uncertaintyAccuracy = []
+    KL = []
     
-    #generate P(X|Y=1) and P(X|Y=0) for target domain
-    dist = dataSimulator.generateTargetDistributions(sourceP0, sourceP1)
-    targetP0 = dist.P0; targetP1 = dist.P1
-    
-    KL0 = getKLdistance(sourceP0, targetP0)
-    KL1 = getKLdistance(sourceP1, targetP1)
-    print("KL0: {0}, KL1: {1}".format(KL0, KL1))
-    print("KL: {0}".format((KL0 + KL1)/2))
+    for alpha in alphas:
+        print(alpha)
+        #generate P(X|Y=1) and P(X|Y=0) for target domain
+        dist = dataSimulator.generateTargetDistributions(sourceP0, sourceP1,alpha)
+        targetP0 = dist.P0; targetP1 = dist.P1
         
-    targetData = getTrainAndTestData('target', targetP0, targetP1, numOfTargetSamples)
-    sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfSourceSamples)
-    
-    testActiveLearnersWithToyData(sourceData, targetData)
-    
+        KL0 = getKLdistance(sourceP0, targetP0)
+        KL1 = getKLdistance(sourceP1, targetP1)
+        print("KL0: {0}, KL1: {1}".format(KL0, KL1))
+        print("KL: {0}".format((KL0 + KL1)/2))
+        KL.append((KL0 + KL1)/2)
+            
+        targetData = getTrainAndTestData('target', targetP0, targetP1, numOfTargetSamples)
+        sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfSourceSamples)
+        
+        results = testActiveLearnersWithToyData(sourceData, targetData)
+        sourceAccuracy.append(results.source.accuracy)
+        targetAccuracy.append(results.target.accuracy)
+        uncertaintyAccuracy.append(results.uncertainty.accuracy)
+    print(sourceAccuracy.append(results.source.accuracy))
     
 if __name__ == '__main__':
     main()

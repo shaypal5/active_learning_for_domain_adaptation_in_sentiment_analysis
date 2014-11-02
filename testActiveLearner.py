@@ -113,6 +113,11 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
     sourceClassRes = testResultantClassifier('source_classifier', sourceClassifier, targetDomain.test)
     print("=================================================================================")
     
+    targetClassRes = None    
+    uncertaintyClassRes = None    
+    partialComClassRes = None    
+    targetSourceQBCClassRes = None    
+    
     #train classifier on target domain
     if runTarget:
         print("\n\n\n")
@@ -164,3 +169,5 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
             print("=================================================================================")    
     
     print("Test done")
+    results = collections.namedtuple('results', ['source', 'target', 'uncertainty', 'partialQBC', 'STQBC'])    
+    return results(sourceClassRes, targetClassRes, uncertaintyClassRes, partialComClassRes, targetSourceQBCClassRes)
