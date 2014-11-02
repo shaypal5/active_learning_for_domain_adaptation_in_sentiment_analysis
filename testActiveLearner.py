@@ -128,7 +128,8 @@ def testActiveLearners(sourceDomain, targetDomain):
     print("\n\n\n")
     print("=================================================================================") 
     print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")
-    for numOfIter in range(40,51,5):
+    for numOfIter in range(55,56,5):
+        print(numOfIter)
         selector = UncertaintySampleSelector()
         learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, 10)
         uncertaintyClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])

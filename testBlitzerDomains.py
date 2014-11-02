@@ -65,7 +65,8 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
     
-def testSomeSpecificCombination():
-    testActiveLearnersWithBlitzerDomains(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)
+def testSomeSpecificCombination(source, target):
+    print("testing from %s to %s" % (source.value, target.value))
+    testActiveLearnersWithBlitzerDomains(source, target)
 
-testSomeSpecificCombination()
+testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)

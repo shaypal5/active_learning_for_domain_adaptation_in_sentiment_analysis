@@ -4,7 +4,7 @@ function [ covMat ] = getCoverianceMatrix( dimension, diff)
 % different enough from the one diffined by N([0,...,0],I) according to Hellinger distance.
 % the function samples matrices from the inverse-wishart distribution until
 % it finds one that satisfies this criterion. The matrix is save to file.
-    DEFAULT_DIMENSION = 120;
+    DEFAULT_DIMENSION = 100;
     switch nargin
         case 0
            diff = 1.1;
@@ -14,27 +14,27 @@ function [ covMat ] = getCoverianceMatrix( dimension, diff)
     end
     
     H = 0;
-    while H < 0.95  
-    %sample a matrix from inverse-wishart
-    covMat = iwishrnd(eye(dimension), dimension);
-    covMat2 = iwishrnd(eye(dimension), dimension);
-    
-    %create P0
-    pdf0.w = (1);
-    pdf0.Mu = (ones(dimension, 1));
-    pdf0.Cov = {eye(dimension)};
-    %pdf0.Cov = {covMat2};
-    
-    %creat P1
-    pdf1.w = (1);
-    pdf1.Mu = (ones(dimension, 1) * diff);
-    pdf1.Cov = {covMat};
-    
-    %check hellinger distance
-    H = uHellingerJointSupport2_ND( pdf0, pdf1 );
-    BC = 1 - H*H;
-    disp(H);
-    disp(BC)
+    while H < 0.9999
+        %sample a matrix from inverse-wishart
+        covMat = iwishrnd(eye(dimension), dimension);
+        covMat2 = iwishrnd(eye(dimension), dimension);
+
+        %create P0
+        pdf0.w = (1);
+        pdf0.Mu = (ones(dimension, 1));
+        pdf0.Cov = {eye(dimension)};
+        %pdf0.Cov = {covMat2};
+
+        %creat P1
+        pdf1.w = (1);
+        pdf1.Mu = (ones(dimension, 1) * diff);
+        pdf1.Cov = {covMat};
+
+        %check hellinger distance
+        H = uHellingerJointSupport2_ND( pdf0, pdf1 );
+        BC = 1 - H*H;
+        disp(H);
+        disp(BC)
     end
 end
 

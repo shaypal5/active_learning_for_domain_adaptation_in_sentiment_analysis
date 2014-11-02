@@ -55,7 +55,7 @@ def getKLdistance(P0, P1):
     
     d = len(cov1)
     invCov0 = np.linalg.inv(cov0)
-    logDeterminant = math.log(np.linalg.det(cov0)/np.linalg.det(cov1))
+    logDeterminant = math.log(np.linalg.det(cov0)/(np.linalg.det(cov1)))
     traceSigmas = np.trace(np.dot(invCov0, cov1))
     muDiff = mu0 - mu1
     muDiffTrans = np.transpose(muDiff)
@@ -151,9 +151,11 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain)
 
 def main(): 
-    n = 120
-    numOfSourceSamples = 1500 #train = 350
-    numOfTargetSamples = 3600 # train = 420
+    n = 100
+#    numOfSourceSamples = 1500 #train = 350
+#    numOfTargetSamples = 3600 # train = 420
+    numOfSourceSamples = 4000 #train = 350
+    numOfTargetSamples = 4000 # train = 420
     
     #generate P(X|Y=1) and P(X|Y=0) for source domain
     dist = dataSimulator.generateSourceDistributions(n)
@@ -170,6 +172,7 @@ def main():
     KL0 = getKLdistance(sourceP0, targetP0)
     KL1 = getKLdistance(sourceP1, targetP1)
     print("KL0: {0}, KL1: {1}".format(KL0, KL1))
+    print("KL: {0}".format((KL0 + KL1)/2))
         
     targetData = getTrainAndTestData('target', targetP0, targetP1, numOfTargetSamples)
     sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfSourceSamples)
