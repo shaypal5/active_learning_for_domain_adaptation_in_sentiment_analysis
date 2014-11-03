@@ -73,7 +73,7 @@ def ndarrayDatasetToSparseMatrices(dataset):
     newSetCsrMat = csr_matrix(newSetMat)
     return newSetMat
     
-def testActiveLearnersWithToyData(sourceData, targetData):
+def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = False, partialSourceTrainSize = None):
     
     print("\n\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % ('toySourceDomain', 'toyTargetDomain'))
@@ -156,7 +156,7 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     runSTQBC = False
     batchSize = 10
     batchRange = [10,15,20]
-    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, vectorizer = None, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
+    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget = runTarget, runUncertainty = runUncertainty, runPartialQBC = runPartialQBC, runSTQBC = runSTQBC, batchSize = batchSize, batchRange = batchRange, partialTargetTrain = partialTargetTrain, partialSourceTrainSize = partialSourceTrainSize, vectorizer = None)
     return results
 
 def main(): 
@@ -173,7 +173,7 @@ def main():
     #check that the distribution are different enough
  #   bhCoeff = dataSimulator.getBhattacharyyaCoefficient(sourceP0, sourceP1)
  #   print(bhCoeff)
-    alphas = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
+    alphas = [1]
     sourceAccuracy = []
     targetAccuracy = []
     uncertaintyAccuracy = []
@@ -194,7 +194,7 @@ def main():
         targetData = getTrainAndTestData('target', targetP0, targetP1, numOfTargetSamples)
         sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfSourceSamples)
         
-        results = testActiveLearnersWithToyData(sourceData, targetData)
+        results = testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = True, partialSourceTrainSize = 300)
         sourceAccuracy.append(results.source.accuracy)
         targetAccuracy.append(results.target.accuracy)
         uncertaintyAccuracy.append(results.uncertainty.accuracy)

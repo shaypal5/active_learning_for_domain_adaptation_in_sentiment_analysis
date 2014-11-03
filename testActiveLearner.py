@@ -39,7 +39,7 @@ def getPartialTrain(originalSetSize, trainSet, newSetSize):
     indexList = list(range(originalSetSize))
     random.shuffle(indexList)
     indexList = indexList[:newSetSize]
-    newTrain = dataType(getSubsetByIndices(trainSet.X,indexList),getSubsetByIndices(trainSet.Y,indexList))
+    newTrain = ActiveLearnerTester.dataType(getSubsetByIndices(trainSet.X,indexList),getSubsetByIndices(trainSet.Y,indexList))
     return newTrain
 
 def testResultantClassifier(name, classifier, testSet):
@@ -103,7 +103,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain, vectorizer = None, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20], partialSourceTrainSize = None, partialTargetTrain = False):
+def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20], partialSourceTrainSize = None, partialTargetTrain = False, vectorizer = None):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -125,7 +125,7 @@ def testActiveLearners(sourceDomain, targetDomain, vectorizer = None, runTarget 
     
     #Check for partial training parameters
     if partialSourceTrainSize != None:
-        sourceDomain.train = getPartialTrain(sourceTrainSize, sourceDomain.train, partialSourceTrainSize)
+        sourceDomain = ActiveLearnerTester.domainType(sourceDomain.name, getPartialTrain(sourceTrainSize, sourceDomain.train, partialSourceTrainSize), sourceDomain.test)
         print("Training source SVM using %d out of a total of %d samples" %(partialSourceTrainSize, sourceTrainSize))
     if partialTargetTrain:    
         partialTargetTrainSize = batchSize * batchRange[0] #number of samples to use for target train    
