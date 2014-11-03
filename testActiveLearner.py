@@ -14,13 +14,33 @@ import ActiveLearner
 
 import collections
 from sklearn.svm import LinearSVC
+import scipy.sparse as sp
 from scipy.sparse import csr_matrix
 from numpy import ndarray
+import numpy as np
+import random
 
 class ActiveLearnerTester:
     dataType = collections.namedtuple('data', ['X', 'Y'])
     domainType = collections.namedtuple('domain', ['name', 'train', 'test'])
     resultsType = collections.namedtuple('result', ['name', 'correct', 'incorrect', 'TP', 'FP', 'TN', 'FN', 'precision', 'recall', 'accuracy'])
+    
+def getSubsetByIndices(orgSet, indices):
+    if type(orgSet) == sp.csr_matrix:
+        return [orgSet[i] for i in indices]
+    elif type(orgSet) == np.ndarray:
+        return [orgSet[i] for i in indices]
+    elif type(orgSet) == list:
+    else:
+        raise ValueError("Unsupported data input of type %s in getSubsetByIndices()." % type(batch))
+
+def getPartialTrain(originalSetSize, trainSet, newSetSize): 
+    indexList = list(range(originalSetSize))
+    random.shuffle(indexList)
+    indexList = indexList[:newSetSize]
+    newTrain = dataType(getSubsetByIndices(trainSet.X,indexList))
+    trainSet.X = [trainSet.X[i] for i in indexList]
+    trainSet.Y = [trainSet.Y[i] for i in indexList]
 
 def testResultantClassifier(name, classifier, testSet):
     TP = 0
@@ -101,7 +121,11 @@ def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None
     partialTargetTrainSize = batchSize * batchRange[0] #number of samples to use for target train    
     if partialSourceTrainSize == None:
         partialSourceTrainSize = sourceTrainSize
-    
+     
+    #When asked, take only a part of source and target train sets
+    sourceDomain.train = getPartialTrain(sourceTrainSize, sourceDomain.train, partialSourceTrainSize)     
+    partialTargetTrain = getPartialTrain(targetTrainSize, targetDomain.train, partialTargetTrainSize)
+        
     print("\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.name, targetDomain.name))
     print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.name, sourceTrainSize+sourceTestSize, sourceTrainSize, sourceTestSize ))
