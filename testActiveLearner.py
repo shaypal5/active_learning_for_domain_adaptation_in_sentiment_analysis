@@ -32,7 +32,7 @@ def getSubsetByIndices(orgSet, indices):
     if type(orgSet) == sp.csr_matrix:
         return sp.csr_matrix(np.ndarray([orgSet[i] for i in indices]))
     elif type(orgSet) == np.ndarray:
-        return [orgSet[i] for i in indices]
+        return np.array([orgSet[i] for i in indices])
     elif type(orgSet) == list:
         return [orgSet[i] for i in indices]
     else:

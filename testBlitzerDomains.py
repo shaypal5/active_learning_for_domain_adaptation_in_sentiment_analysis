@@ -61,10 +61,12 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     featureNames = vectorizer.get_feature_names()
     sent = SentimentWordFrequencyModel()
     featSentDict = {}
+    '''
     for i in range(len(featureNames)):
         word = featureNames[i]
         if '_' not in word:
             featSentDict[i]  = sent.getSentimentOfWord(word)
+    '''
     #print(featSentDict)
     
     '''
@@ -97,7 +99,7 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     
     classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, False, True, False, False) #Runing only partialQBC
-    bathConfig = ActiveLearnerTester.bathConfigType(10,[2])
+    bathConfig = ActiveLearnerTester.bathConfigType(10,[40, 45, 50])
     partialTrainConfig = None
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, featureSentimentDict = featSentDict)
     
@@ -106,4 +108,4 @@ def testSomeSpecificCombination(source, target):
     testActiveLearnersWithBlitzerDomains(source, target)
     #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
-testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.cellphones)
+testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)

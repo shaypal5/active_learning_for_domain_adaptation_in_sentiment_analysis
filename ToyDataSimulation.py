@@ -74,7 +74,18 @@ def ndarrayDatasetToSparseMatrices(dataset):
     #newSetCsrMat = csr_matrix(newSetMat)
     return newSetMat
     
-def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = False, partialSourceTrainSize = None):
+def writeResultsToFile(alpha, sourceAccuracy, targetAccuracy, uncertaintyAccuracy, KL, file):
+    file.write("alpha: {0}\n".format(alpha))
+    file.write("KL: {0}\n".format(KL))
+    file.write("source accuracy:\n")
+    file.write(''.join(str(e) for e in sourceAccuracy))
+    file.write("\ntarget accuracy:\n")
+    file.write(''.join(str(e) for e in targetAccuracy))
+    file.write("\nuncertainty accuracy:\n")
+    file.write(''.join(str(e) for e in uncertaintyAccuracy))
+    file.write("\n=======================\n")
+    
+def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = False, partialSourceTrainSize = None, numberOfBatches=20):
     
     print("\n\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % ('toySourceDomain', 'toyTargetDomain'))
@@ -156,8 +167,8 @@ def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = F
     runPartialQBC = False
     runSTQBC = False
     runSentimentIntensity = False
-    batchSize = 10
-    batchRange = [10,15,20]
+    batchSize = 20        #the size of each size
+    batchRange = [numberOfBatches] #numbr of batches
     if partialSourceTrainSize != None:
         partialSourceTrain = True
     else:
@@ -178,6 +189,7 @@ def main():
 #    numOfTargetSamples = 3600 # train = 420
     numOfSourceSamples = 4000
     numOfTargetSamples = 4000
+    MAX_TRAIN_SIZE = 2800
     
     #generate P(X|Y=1) and P(X|Y=0) for source domain
     dist = dataSimulator.generateSourceDistributions(n)
@@ -186,13 +198,12 @@ def main():
     #check that the distribution are different enough
  #   bhCoeff = dataSimulator.getBhattacharyyaCoefficient(sourceP0, sourceP1)
  #   print(bhCoeff)
-    alphas = [1]
-    sourceAccuracy = []
-    targetAccuracy = []
-    uncertaintyAccuracy = []
-    KL = []
-    
+    alphas = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4]
+    sourceTrainSize = range(200, 2700, 200)
+    resultsFile = open("resultsFile.txt",'w+')
+            
     for alpha in alphas:
+        KL = []    
         print(alpha)
         #generate P(X|Y=1) and P(X|Y=0) for target domain
         dist = dataSimulator.generateTargetDistributions(sourceP0, sourceP1,alpha)
@@ -207,10 +218,19 @@ def main():
         targetData = getTrainAndTestData('target', targetP0, targetP1, numOfTargetSamples)
         sourceData = getTrainAndTestData('source', sourceP0, sourceP1, numOfSourceSamples)
         
-        results = testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = True, partialSourceTrainSize = 300)
-        sourceAccuracy.append(results.source.accuracy)
-        targetAccuracy.append(results.target.accuracy)
-        uncertaintyAccuracy.append(results.uncertainty.accuracy)
+        sourceAccuracy = []
+        targetAccuracy = []
+        uncertaintyAccuracy = []    
+        
+        for currSourceTrainSize in sourceTrainSize:
+            currNumOfBatches = math.floor((MAX_TRAIN_SIZE - currSourceTrainSize) / 20)
+            results = testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = True, partialSourceTrainSize = currSourceTrainSize, numberOfBatches = currNumOfBatches)
+            sourceAccuracy.append(results.source.accuracy)
+            targetAccuracy.append(results.target.accuracy)
+            uncertaintyAccuracy.append(results.uncertainty.accuracy)
+        writeResultsToFile(alpha, sourceAccuracy, targetAccuracy, uncertaintyAccuracy, KL, resultsFile)
+    
+    resultsFile.close()
     print("source")
     print(sourceAccuracy)
     print("target")
