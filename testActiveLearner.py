@@ -106,7 +106,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bathConfig = None, partialTrainConfig = None, vectorizer = None):
+def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bathConfig = None, partialTrainConfig = None, featureSentimentDict = None):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -221,7 +221,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
         print("(6) Testing Active Learning classifier with *Sentiment Intensity* sample selector: ") 
         for numOfIter in bathConfig.batchRange:
             print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
-            selector = SentimentIntensitySampleSelector(vectorizer)
+            selector = SentimentIntensitySampleSelector(featureSentimentDict)
             learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
             sentimentIntensityClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             sentimentIntensityClassRes = testResultantClassifier('partial_committee_classifier', sentimentIntensityClassifier, targetDomain.test)

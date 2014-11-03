@@ -9,13 +9,14 @@ import parseProcessedDataFileForScikit
 import testActiveLearner
 from testActiveLearner import ActiveLearnerTester
 from BlitzerDatasetDomain import BlitzerDatasetDomain
+from SentimentWordFrequencyModel import SentimentWordFrequencyModel
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
 def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     
-    print("\n\n\n\n")
+    print("\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
     print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.value, sourceDomain.getNumOfTotalInstanceInDomain(), sourceDomain.getNumOfTrainInstanceInDomain(), sourceDomain.getNumOfTestInstanceInDomain() ))
     print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.value, targetDomain.getNumOfTotalInstanceInDomain(), targetDomain.getNumOfTrainInstanceInDomain(), targetDomain.getNumOfTestInstanceInDomain() ))    
@@ -55,6 +56,17 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTestYtarget = encoder.transform(testYtarget)
     print("testY type is %s" % type(newTestYtarget))
     
+    #Build feature sentiment dict
+    print("Building feature sentiment dict")
+    featureNames = vectorizer.get_feature_names()
+    sent = SentimentWordFrequencyModel()
+    featSentDict = {}
+    for i in range(len(featureNames)):
+        word = featureNames[i]
+        if '_' not in word:
+            featSentDict[i]  = sent.getSentimentOfWord(word)
+    #print(featSentDict)
+    
     '''
     #Check how to de-vectorize
     #print("Vectorizer.get_feature_names():")
@@ -84,10 +96,10 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     
-    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, False) #Runing only target and uncertainty
-    bathConfig = ActiveLearnerTester.bathConfigType(10,[20])
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, True) #Runing only target and uncertainty
+    bathConfig = ActiveLearnerTester.bathConfigType(10,[2])
     partialTrainConfig = None
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, vectorizer = vectorizer)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, featureSentimentDict = featSentDict)
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
