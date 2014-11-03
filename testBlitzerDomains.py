@@ -96,7 +96,7 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     
-    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, True) #Runing only target and uncertainty
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, False, True, False, False) #Runing only partialQBC
     bathConfig = ActiveLearnerTester.bathConfigType(10,[2])
     partialTrainConfig = None
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, featureSentimentDict = featSentDict)
