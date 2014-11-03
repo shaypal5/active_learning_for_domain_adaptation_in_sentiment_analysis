@@ -43,7 +43,10 @@ class SentimentWordFrequencyModel:
         self.sentWordPercentageInNeg = 0
     
     def getSentimentOfWord(self, word):
-        sentSet = list(swn.senti_synsets(word))
+        try:
+            sentSet = list(swn.senti_synsets(word))
+        except:
+            return 0
         
         #if not found, assume objective word
         if len(sentSet) == 0:

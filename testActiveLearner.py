@@ -8,6 +8,7 @@ Created on Wed Oct 15 18:33:19 2014
 from UncertaintySampleSelector import UncertaintySampleSelector
 from QueryByPartialDataCommiteeSampleSelector import QueryByPartialDataCommiteeSampleSelector
 from TargetAndSourceQBCSampleSelector import TargetAndSourceQBCSampleSelector
+from SentimentIntensitySampleSelector import SentimentIntensitySampleSelector
 
 import ActiveLearner
 
@@ -82,7 +83,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, batchSize = 10, batchRange = [20]):
+def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20]):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -166,8 +167,21 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
             learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
             targetSourceQBCClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             targetSourceQBCClassRes = testResultantClassifier('partial_committee_classifier', targetSourceQBCClassifier, targetDomain.test)
+            print("=================================================================================")
+
+    #test SENTIMENT intensity selector
+    if runSentimentIntensity:
+        print("\n\n\n")
+        print("=================================================================================") 
+        print("(6) Testing Active Learning classifier with *Sentiment Intensity* sample selector: ") 
+        for numOfIter in batchRange:
+            print("With %d iterations of %d each" % (numOfIter,batchSize))
+            selector = SentimentIntensitySampleSelector()
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            sentimentIntensityClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
+            sentimentIntensityClassRes = testResultantClassifier('partial_committee_classifier', sentimentIntensityClassifier, targetDomain.test)
             print("=================================================================================")    
     
     print("Test done")
-    results = collections.namedtuple('results', ['source', 'target', 'uncertainty', 'partialQBC', 'STQBC'])    
-    return results(sourceClassRes, targetClassRes, uncertaintyClassRes, partialComClassRes, targetSourceQBCClassRes)
+    results = collections.namedtuple('results', ['source', 'target', 'uncertainty', 'partialQBC', 'STQBC', 'sentimentIntensity'])    
+    return results(sourceClassRes, targetClassRes, uncertaintyClassRes, partialComClassRes, targetSourceQBCClassRes, sentimentIntensityClassRes)

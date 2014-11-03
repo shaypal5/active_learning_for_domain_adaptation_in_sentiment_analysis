@@ -12,7 +12,7 @@ from BlitzerDatasetDomain import BlitzerDatasetDomain
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
-def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, batchSize = 10, batchRange = [20]):
+def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20]):
     
     print("\n\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
@@ -63,11 +63,11 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget =
     # Package domains
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC,  runSentimentIntensity, batchSize, batchRange)
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
-    testActiveLearnersWithBlitzerDomains(source, target, runTarget = False, runUncertainty = False, runPartialQBC = True, batchRange = [2,5,10])
+    testActiveLearnersWithBlitzerDomains(source, target, runTarget = False, runUncertainty = True, runPartialQBC = False, runSentimentIntensity = True, batchRange = [2,5,10])
     #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
-testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)
+testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.cellphones)
