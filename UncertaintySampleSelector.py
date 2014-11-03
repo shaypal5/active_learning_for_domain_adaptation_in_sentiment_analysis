@@ -2,7 +2,7 @@
 """
 Created on Tue Oct 14 17:49:30 2014
 
-@author: inbar
+@author: shaypalachy
 """
 from NewSampleSelector import SampleSelector
 
