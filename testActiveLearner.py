@@ -83,7 +83,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20]):
+def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20]):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -98,6 +98,9 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
     else:
         raise ValueError("Unsupported data input of type %s." % type(sourceDomain.train.Y))
         
+    partialTargetTrainSize = batchSize * batchRange[0] #number of samples to use for target train    
+    if partialSourceTrainSize == None:
+        partialSourceTrainSize = sourceTrainSize
     
     print("\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.name, targetDomain.name))

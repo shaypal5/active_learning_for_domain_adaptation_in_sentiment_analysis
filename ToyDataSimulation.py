@@ -163,8 +163,8 @@ def main():
     n = 500
 #    numOfSourceSamples = 1500 #train = 350
 #    numOfTargetSamples = 3600 # train = 420
-    numOfSourceSamples = 4000 #train = 350
-    numOfTargetSamples = 4000 # train = 420
+    numOfSourceSamples = 4000
+    numOfTargetSamples = 4000
     
     #generate P(X|Y=1) and P(X|Y=0) for source domain
     dist = dataSimulator.generateSourceDistributions(n)
@@ -173,7 +173,7 @@ def main():
     #check that the distribution are different enough
  #   bhCoeff = dataSimulator.getBhattacharyyaCoefficient(sourceP0, sourceP1)
  #   print(bhCoeff)
-    alphas = [1, 0.95, 0.9, 0.85, 0.8]
+    alphas = [1, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0]
     sourceAccuracy = []
     targetAccuracy = []
     uncertaintyAccuracy = []
@@ -198,7 +198,14 @@ def main():
         sourceAccuracy.append(results.source.accuracy)
         targetAccuracy.append(results.target.accuracy)
         uncertaintyAccuracy.append(results.uncertainty.accuracy)
-    print(sourceAccuracy.append(results.source.accuracy))
+    print("source")
+    print(sourceAccuracy)
+    print("target")
+    print(targetAccuracy)
+    print("uncertainty")
+    print(uncertaintyAccuracy)
+    print("KL")
+    print(KL)
     
 if __name__ == '__main__':
     main()
