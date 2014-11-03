@@ -7,12 +7,13 @@ Created on Mon Oct 27 11:14:31 2014
 
 import parseProcessedDataFileForScikit
 import testActiveLearner
+from testActiveLearner import ActiveLearnerTester
 from BlitzerDatasetDomain import BlitzerDatasetDomain
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
 
-def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20]):
+def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     
     print("\n\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.value, targetDomain.value))
@@ -54,15 +55,24 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget =
     newTestYtarget = encoder.transform(testYtarget)
     print("testY type is %s" % type(newTestYtarget))
     
+    '''
     #Check how to de-vectorize
+    #print("Vectorizer.get_feature_names():")
+    #print(vectorizer.get_feature_names())
     print("Check how to de-vectorize")
-    sample = newTestXsource[0]
+    sample = newTestXsource[0][0]
     print("Vectorized sample:")
     print(type(sample))
     print(sample)
-    print(sample[0])
-    for entry in sample:
-        print(type(entry))
+    print("sample.shape[0] = %d" % sample.shape[0])
+    print("sample.shape[1] = %d" % sample.shape[1])
+    print("De-Vectorized sample:")
+    for i in range(sample.shape[1]):
+        if (sample[0,i] != 0):
+            #print("%d, %f" % (i,sample[0,i]))
+            word = vectorizer.get_feature_names()[i]
+            print("%s, %f" % (word,sample[0,i]))
+    '''
     
     # Package train and test sets
     newTrainSource = testActiveLearner.ActiveLearnerTester.dataType(newTrainXsource, newTrainYsource)
@@ -73,11 +83,15 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget =
     # Package domains
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, vectorizer, runTarget, runUncertainty, runPartialQBC, runSTQBC,  runSentimentIntensity, batchSize, batchRange)
+    
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, False) #Runing only target and uncertainty
+    bathConfig = ActiveLearnerTester.bathConfigType(10,[20])
+    partialTrainConfig = None
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, vectorizer = vectorizer)
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
-    testActiveLearnersWithBlitzerDomains(source, target, runTarget = False, runUncertainty = True, runPartialQBC = False, runSentimentIntensity = False, batchRange = [2])
+    testActiveLearnersWithBlitzerDomains(source, target)
     #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
 testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.cellphones)

@@ -24,6 +24,9 @@ class ActiveLearnerTester:
     dataType = collections.namedtuple('data', ['X', 'Y'])
     domainType = collections.namedtuple('domain', ['name', 'train', 'test'])
     resultsType = collections.namedtuple('result', ['name', 'correct', 'incorrect', 'TP', 'FP', 'TN', 'FN', 'precision', 'recall', 'accuracy'])
+    classifiersToRunType = collections.namedtuple('classifiersToRun', ['target', 'uncertainty', 'partialQBC', 'STQBC', 'sentimentIntensity'])
+    bathConfigType = collections.namedtuple('batchConfig', ['batchSize', 'batchRange'])
+    partialTrainConfigType = collections.namedtuple('partialTrainConfig', ['partialSourceTrain', 'partialTargetTrain', 'partialSourceTrainSize'])
     
 def getSubsetByIndices(orgSet, indices):
     if type(orgSet) == sp.csr_matrix:
@@ -33,7 +36,7 @@ def getSubsetByIndices(orgSet, indices):
     elif type(orgSet) == list:
         return [orgSet[i] for i in indices]
     else:
-        raise ValueError("Unsupported data input of type %s in getSubsetByIndices()." % type(batch))
+        raise ValueError("Unsupported data input of type %s in getSubsetByIndices()." % type(orgSet))
 
 def getPartialTrain(originalSetSize, trainSet, newSetSize): 
     indexList = list(range(originalSetSize))
@@ -103,7 +106,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20], partialSourceTrainSize = None, partialTargetTrain = False, vectorizer = None):
+def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bathConfig = None, partialTrainConfig = None, vectorizer = None):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -121,16 +124,25 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
     print("\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.name, targetDomain.name))
     print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.name, sourceTrainSize+sourceTestSize, sourceTrainSize, sourceTestSize ))
-    print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.name, targetTrainSize+targetTestSize, targetTrainSize, targetTestSize ))  
+    print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.name, targetTrainSize+targetTestSize, targetTrainSize, targetTestSize ))
     
+    #Default parameters
+    if classifiersToRun == None:
+        classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, False) #Runing only target and uncertainty
+    if bathConfig == None:
+        bathConfig = ActiveLearnerTester.bathConfigType(10,[20])
+        
+    partialTargetTrain = False
     #Check for partial training parameters
-    if partialSourceTrainSize != None:
-        sourceDomain = ActiveLearnerTester.domainType(sourceDomain.name, getPartialTrain(sourceTrainSize, sourceDomain.train, partialSourceTrainSize), sourceDomain.test)
-        print("Training source SVM using %d out of a total of %d samples" %(partialSourceTrainSize, sourceTrainSize))
-    if partialTargetTrain:    
-        partialTargetTrainSize = batchSize * batchRange[0] #number of samples to use for target train    
-        partialTargetTrain = getPartialTrain(targetTrainSize, targetDomain.train, partialTargetTrainSize)
-        print("Training target SVM using %d out of a total of %d samples" %(partialTargetTrainSize, targetTrainSize)) 
+    if partialTrainConfig != None:
+        if partialTrainConfig.partialSourceTrain:
+            sourceDomain = ActiveLearnerTester.domainType(sourceDomain.name, getPartialTrain(sourceTrainSize, sourceDomain.train, partialTrainConfig.partialSourceTrainSize), sourceDomain.test)
+            print("Training source SVM using %d out of a total of %d samples" %(partialTrainConfig.partialSourceTrainSize, sourceTrainSize))
+        if partialTrainConfig.partialTargetTrain:    
+            partialTargetTrain = True
+            partialTargetTrainSize = bathConfig.batchSize * bathConfig.batchRange[0] #number of samples to use for target train    
+            partialTargetTrainSet = getPartialTrain(targetTrainSize, targetDomain.train, partialTargetTrainSize)
+            print("Training target SVM using %d out of a total of %d samples" %(partialTargetTrainSize, targetTrainSize)) 
         
     #train classifier on source domain
     print("\n\n\n")
@@ -149,13 +161,13 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
     sentimentIntensityClassRes = None
     
     #train classifier on target domain
-    if runTarget:
+    if classifiersToRun.target:
         print("\n\n\n")
         print("=================================================================================")
         print("(2) Testing Target classifier: ")
         targetClassifier = LinearSVC()
         if partialTargetTrain:
-            targetClassifier.fit(partialTargetTrain.X, partialTargetTrain.Y)
+            targetClassifier.fit(partialTargetTrainSet.X, partialTargetTrainSet.Y)
             print("target classifier was trained on %d labeled instances out of a total of %d" % (partialTargetTrainSize, targetTrainSize))
         else:
             targetClassifier.fit(targetDomain.train.X, targetDomain.train.Y)            
@@ -164,53 +176,53 @@ def testActiveLearners(sourceDomain, targetDomain, runTarget = True, runUncertai
         print("=================================================================================")
     
     #test UNCERTAINTY classifier
-    if runUncertainty:
+    if classifiersToRun.uncertainty:
         print("\n\n\n")
         print("=================================================================================") 
         print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")
-        for numOfIter in batchRange:
-            print("With %d iterations of %d each" % (numOfIter,batchSize))
+        for numOfIter in bathConfig.batchRange:
+            print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
             selector = UncertaintySampleSelector()
-            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
             uncertaintyClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             uncertaintyClassRes = testResultantClassifier('uncertainty_classifier', uncertaintyClassifier, targetDomain.test)
             print("=================================================================================")
 
     #test PARTIAL QBC
-    if runPartialQBC:
+    if classifiersToRun.partialQBC:
         print("\n\n\n")
         print("=================================================================================")   
         print("(4) Testing Active Learning classifier with *Query By Partial Data Commitee* sample selector: ") 
-        for numOfIter in batchRange:
-            print("With %d iterations of %d each" % (numOfIter,batchSize))
+        for numOfIter in bathConfig.batchRange:
+            print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
             selector = QueryByPartialDataCommiteeSampleSelector(sourceClassifier)
-            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
             partialComClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             partialComClassRes = testResultantClassifier('partial_committee_classifier', partialComClassifier, targetDomain.test)
             print("=================================================================================")
 
     #test TARGET & SOURCE QBC
-    if runSTQBC:
+    if classifiersToRun.STQBC:
         print("\n\n\n")
         print("=================================================================================") 
         print("(5) Testing Active Learning classifier with *Target & Source QBC* sample selector: ") 
-        for numOfIter in batchRange:
-            print("With %d iterations of %d each" % (numOfIter,batchSize))
+        for numOfIter in bathConfig.batchRange:
+            print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
             selector = TargetAndSourceQBCSampleSelector(sourceClassifier)
-            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
             targetSourceQBCClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             targetSourceQBCClassRes = testResultantClassifier('partial_committee_classifier', targetSourceQBCClassifier, targetDomain.test)
             print("=================================================================================")
 
     #test SENTIMENT intensity selector
-    if runSentimentIntensity:
+    if classifiersToRun.sentimentIntensity:
         print("\n\n\n")
         print("=================================================================================") 
         print("(6) Testing Active Learning classifier with *Sentiment Intensity* sample selector: ") 
-        for numOfIter in batchRange:
-            print("With %d iterations of %d each" % (numOfIter,batchSize))
+        for numOfIter in bathConfig.batchRange:
+            print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
             selector = SentimentIntensitySampleSelector(vectorizer)
-            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
             sentimentIntensityClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             sentimentIntensityClassRes = testResultantClassifier('partial_committee_classifier', sentimentIntensityClassifier, targetDomain.test)
             print("=================================================================================")    

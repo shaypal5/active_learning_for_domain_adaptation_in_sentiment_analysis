@@ -17,10 +17,15 @@ class SentimentIntensitySampleSelector(SampleSelector):
     def getSentScore(self, sample):
         count = 0
         score = 0
-        for token in sample:
-            word = self.vectorizer.get_feature_names()[token]
-            count += 1
-            score += abs(self.sentimMeasure.getSentimentOfWord(word))
+        
+        for i in range(sample.shape[1]):
+            if (sample[0,i] != 0):
+                word = self.vectorizer.get_feature_names()[i]
+                if '_' not in word:
+                    count += 1
+                    score += abs(self.sentimMeasure.getSentimentOfWord(word))
+                    print("%s, %f" % (word,sample[0,i]))        
+        
         if count == 0:
             return 0
         return score/count

@@ -9,6 +9,7 @@ import simulateGaussianDomains as dataSimulator
 import numpy as np
 import collections
 import testActiveLearner
+from testActiveLearner import ActiveLearnerTester
 import math
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
@@ -70,7 +71,7 @@ def ndarrayDatasetToSparseMatrices(dataset):
         newSet.append(csr_matrix(inst))
     newSetNdarray = np.asarray(newSet)
     newSetMat = np.matrix(newSetNdarray, dtype = csr_matrix)
-    newSetCsrMat = csr_matrix(newSetMat)
+    #newSetCsrMat = csr_matrix(newSetMat)
     return newSetMat
     
 def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = False, partialSourceTrainSize = None):
@@ -154,9 +155,21 @@ def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = F
     runUncertainty = True
     runPartialQBC = False
     runSTQBC = False
+    runSentimentIntensity = False
     batchSize = 10
     batchRange = [10,15,20]
-    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget = runTarget, runUncertainty = runUncertainty, runPartialQBC = runPartialQBC, runSTQBC = runSTQBC, batchSize = batchSize, batchRange = batchRange, partialTargetTrain = partialTargetTrain, partialSourceTrainSize = partialSourceTrainSize, vectorizer = None)
+    if partialSourceTrainSize != None:
+        partialSourceTrain = True
+    else:
+        partialSourceTrainSize = False
+    
+    #package parameters
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(runTarget, runUncertainty, runPartialQBC, runSTQBC, runSentimentIntensity) #Runing only target and uncertainty
+    bathConfig = ActiveLearnerTester.bathConfigType(batchSize,batchRange)
+    partialTrainConfig = ActiveLearnerTester.partialTrainConfigType(partialSourceTrain, partialTargetTrain, partialSourceTrainSize)
+    
+    #run
+    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig)
     return results
 
 def main(): 
