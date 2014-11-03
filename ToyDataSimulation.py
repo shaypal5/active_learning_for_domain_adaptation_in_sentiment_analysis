@@ -156,7 +156,7 @@ def testActiveLearnersWithToyData(sourceData, targetData):
     runSTQBC = False
     batchSize = 10
     batchRange = [10,15,20]
-    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
+    results = testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, vectorizer = None, runTarget, runUncertainty, runPartialQBC, runSTQBC, batchSize, batchRange)
     return results
 
 def main(): 

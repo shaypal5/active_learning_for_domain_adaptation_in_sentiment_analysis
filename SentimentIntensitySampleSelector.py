@@ -8,13 +8,17 @@ from NewSampleSelector import SampleSelector
 from SentimentWordFrequencyModel import SentimentWordFrequencyModel
 
 class SentimentIntensitySampleSelector(SampleSelector):
-    
-    sentimMeasure = SentimentWordFrequencyModel()
+
+    def __init__(self, vectorizer):
+        SampleSelector.__init__(self)
+        self.vectorizer = vectorizer
+        self.sentimMeasure = SentimentWordFrequencyModel()
     
     def getSentScore(self, sample):
         count = 0
         score = 0
-        for word in sample:
+        for token in sample:
+            word = self.vectorizer.get_feature_names()[token]
             count += 1
             score += abs(self.sentimMeasure.getSentimentOfWord(word))
         if count == 0:

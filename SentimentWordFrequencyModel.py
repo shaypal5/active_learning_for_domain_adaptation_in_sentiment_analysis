@@ -46,6 +46,7 @@ class SentimentWordFrequencyModel:
         try:
             sentSet = list(swn.senti_synsets(word))
         except:
+            print("swn.senti_synsets(word) threw an error")
             return 0
         
         #if not found, assume objective word

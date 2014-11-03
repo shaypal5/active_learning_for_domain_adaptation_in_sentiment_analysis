@@ -27,10 +27,11 @@ class ActiveLearnerTester:
     
 def getSubsetByIndices(orgSet, indices):
     if type(orgSet) == sp.csr_matrix:
-        return [orgSet[i] for i in indices]
+        return sp.csr_matrix(np.ndarray([orgSet[i] for i in indices]))
     elif type(orgSet) == np.ndarray:
         return [orgSet[i] for i in indices]
     elif type(orgSet) == list:
+        return [orgSet[i] for i in indices]
     else:
         raise ValueError("Unsupported data input of type %s in getSubsetByIndices()." % type(batch))
 
@@ -38,9 +39,8 @@ def getPartialTrain(originalSetSize, trainSet, newSetSize):
     indexList = list(range(originalSetSize))
     random.shuffle(indexList)
     indexList = indexList[:newSetSize]
-    newTrain = dataType(getSubsetByIndices(trainSet.X,indexList))
-    trainSet.X = [trainSet.X[i] for i in indexList]
-    trainSet.Y = [trainSet.Y[i] for i in indexList]
+    newTrain = dataType(getSubsetByIndices(trainSet.X,indexList),getSubsetByIndices(trainSet.Y,indexList))
+    return newTrain
 
 def testResultantClassifier(name, classifier, testSet):
     TP = 0
@@ -103,7 +103,7 @@ def checkSizes(self, trainData, testData):
         '''
 
 #each domain is a tuple of (name, train, test)
-def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20]):
+def testActiveLearners(sourceDomain, targetDomain, vectorizer = None, runTarget = True, runUncertainty = True, runPartialQBC = False, runSTQBC = False, runSentimentIntensity = False, batchSize = 10, batchRange = [20], partialSourceTrainSize = None, partialTargetTrain = False):
     
     if type(sourceDomain.train.Y) == csr_matrix:
         sourceTrainSize = sourceDomain.train.Y.shape[0]
@@ -118,19 +118,20 @@ def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None
     else:
         raise ValueError("Unsupported data input of type %s." % type(sourceDomain.train.Y))
         
-    partialTargetTrainSize = batchSize * batchRange[0] #number of samples to use for target train    
-    if partialSourceTrainSize == None:
-        partialSourceTrainSize = sourceTrainSize
-     
-    #When asked, take only a part of source and target train sets
-    sourceDomain.train = getPartialTrain(sourceTrainSize, sourceDomain.train, partialSourceTrainSize)     
-    partialTargetTrain = getPartialTrain(targetTrainSize, targetDomain.train, partialTargetTrainSize)
-        
     print("\n\n\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.name, targetDomain.name))
     print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.name, sourceTrainSize+sourceTestSize, sourceTrainSize, sourceTestSize ))
     print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.name, targetTrainSize+targetTestSize, targetTrainSize, targetTestSize ))  
     
+    #Check for partial training parameters
+    if partialSourceTrainSize != None:
+        sourceDomain.train = getPartialTrain(sourceTrainSize, sourceDomain.train, partialSourceTrainSize)
+        print("Training source SVM using %d out of a total of %d samples" %(partialSourceTrainSize, sourceTrainSize))
+    if partialTargetTrain:    
+        partialTargetTrainSize = batchSize * batchRange[0] #number of samples to use for target train    
+        partialTargetTrain = getPartialTrain(targetTrainSize, targetDomain.train, partialTargetTrainSize)
+        print("Training target SVM using %d out of a total of %d samples" %(partialTargetTrainSize, targetTrainSize)) 
+        
     #train classifier on source domain
     print("\n\n\n")
     print("=================================================================================")
@@ -144,7 +145,8 @@ def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None
     targetClassRes = None    
     uncertaintyClassRes = None    
     partialComClassRes = None    
-    targetSourceQBCClassRes = None    
+    targetSourceQBCClassRes = None
+    sentimentIntensityClassRes = None
     
     #train classifier on target domain
     if runTarget:
@@ -152,8 +154,12 @@ def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None
         print("=================================================================================")
         print("(2) Testing Target classifier: ")
         targetClassifier = LinearSVC()
-        targetClassifier.fit(targetDomain.train.X,targetDomain.train.Y)
-        print("target classifier was trained on %d labeled instances" % targetTrainSize)
+        if partialTargetTrain:
+            targetClassifier.fit(partialTargetTrain.X, partialTargetTrain.Y)
+            print("target classifier was trained on %d labeled instances out of a total of %d" % (partialTargetTrainSize, targetTrainSize))
+        else:
+            targetClassifier.fit(targetDomain.train.X, targetDomain.train.Y)            
+            print("target classifier was trained on %d labeled instances" % targetTrainSize)
         targetClassRes = testResultantClassifier('target_classifier', targetClassifier, targetDomain.test)
         print("=================================================================================")
     
@@ -203,7 +209,7 @@ def testActiveLearners(sourceDomain, targetDomain, partialSourceTrainSize = None
         print("(6) Testing Active Learning classifier with *Sentiment Intensity* sample selector: ") 
         for numOfIter in batchRange:
             print("With %d iterations of %d each" % (numOfIter,batchSize))
-            selector = SentimentIntensitySampleSelector()
+            selector = SentimentIntensitySampleSelector(vectorizer)
             learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, batchSize)
             sentimentIntensityClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             sentimentIntensityClassRes = testResultantClassifier('partial_committee_classifier', sentimentIntensityClassifier, targetDomain.test)

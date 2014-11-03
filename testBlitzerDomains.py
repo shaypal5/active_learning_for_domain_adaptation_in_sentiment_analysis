@@ -54,6 +54,16 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget =
     newTestYtarget = encoder.transform(testYtarget)
     print("testY type is %s" % type(newTestYtarget))
     
+    #Check how to de-vectorize
+    print("Check how to de-vectorize")
+    sample = newTestXsource[0]
+    print("Vectorized sample:")
+    print(type(sample))
+    print(sample)
+    print(sample[0])
+    for entry in sample:
+        print(type(entry))
+    
     # Package train and test sets
     newTrainSource = testActiveLearner.ActiveLearnerTester.dataType(newTrainXsource, newTrainYsource)
     newTestSource = testActiveLearner.ActiveLearnerTester.dataType(newTestXsource, newTestYsource)
@@ -63,11 +73,11 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain, runTarget =
     # Package domains
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, runTarget, runUncertainty, runPartialQBC, runSTQBC,  runSentimentIntensity, batchSize, batchRange)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, vectorizer, runTarget, runUncertainty, runPartialQBC, runSTQBC,  runSentimentIntensity, batchSize, batchRange)
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
-    testActiveLearnersWithBlitzerDomains(source, target, runTarget = False, runUncertainty = True, runPartialQBC = False, runSentimentIntensity = True, batchRange = [2,5,10])
+    testActiveLearnersWithBlitzerDomains(source, target, runTarget = False, runUncertainty = True, runPartialQBC = False, runSentimentIntensity = False, batchRange = [2])
     #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
 testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.cellphones)
