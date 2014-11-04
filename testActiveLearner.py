@@ -121,7 +121,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
     else:
         raise ValueError("Unsupported data input of type %s." % type(sourceDomain.train.Y))
         
-    print("\n\n\n")
+    print("\n")
     print("Checking domain adaptation from source domain %s to target domain %s" % (sourceDomain.name, targetDomain.name))
     print("|Source Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (sourceDomain.name, sourceTrainSize+sourceTestSize, sourceTrainSize, sourceTestSize ))
     print("|Target Domain: %s | Total Size: %d | Train Set Size: %d | Test Set Size: %d |" % (targetDomain.name, targetTrainSize+targetTestSize, targetTrainSize, targetTestSize ))
@@ -145,7 +145,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
             print("Training target SVM using %d out of a total of %d samples" %(partialTargetTrainSize, targetTrainSize)) 
         
     #train classifier on source domain
-    print("\n\n\n")
+    print("\n")
     print("=================================================================================")
     print("(1) Testing Source Classifier: ")
     sourceClassifier = LinearSVC()
@@ -162,7 +162,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
     
     #train classifier on target domain
     if classifiersToRun.target:
-        print("\n\n\n")
+        print("\n")
         print("=================================================================================")
         print("(2) Testing Target classifier: ")
         targetClassifier = LinearSVC()
@@ -177,7 +177,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
     
     #test UNCERTAINTY classifier
     if classifiersToRun.uncertainty:
-        print("\n\n\n")
+        print("\n")
         print("=================================================================================") 
         print("(3) Testing Active Learning classifier with UNCERTAINTY sample selector: ")
         for numOfIter in bathConfig.batchRange:
@@ -190,7 +190,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
 
     #test PARTIAL QBC
     if classifiersToRun.partialQBC:
-        print("\n\n\n")
+        print("\n")
         print("=================================================================================")   
         print("(4) Testing Active Learning classifier with *Query By Partial Data Commitee* sample selector: ") 
         for numOfIter in bathConfig.batchRange:
@@ -203,7 +203,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
 
     #test TARGET & SOURCE QBC
     if classifiersToRun.STQBC:
-        print("\n\n\n")
+        print("\n")
         print("=================================================================================") 
         print("(5) Testing Active Learning classifier with *Target & Source QBC* sample selector: ") 
         for numOfIter in bathConfig.batchRange:
@@ -216,7 +216,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
 
     #test SENTIMENT intensity selector
     if classifiersToRun.sentimentIntensity:
-        print("\n\n\n")
+        print("\n")
         print("=================================================================================") 
         print("(6) Testing Active Learning classifier with *Sentiment Intensity* sample selector: ") 
         for numOfIter in bathConfig.batchRange:

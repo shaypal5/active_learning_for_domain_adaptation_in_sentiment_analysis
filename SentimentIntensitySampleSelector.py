@@ -53,7 +53,7 @@ class SentimentIntensitySampleSelector(SampleSelector):
             
     
     def selectSamples(self, svm,samplesPool,batchSize):
-        print("selectSamples() in SentimentIntensitySampleSelector")
+        #print("selectSamples() in SentimentIntensitySampleSelector")
         samples = samplesPool[0]
         sent_scores = [self.getSentScore(sample) for sample in samples]
         if not self.hadNonZeroScoreYet:

@@ -100,7 +100,7 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     
     classifiersToRun = ActiveLearnerTester.classifiersToRunType(False, False, False, False, True) #Runing only partialQBC
-    bathConfig = ActiveLearnerTester.bathConfigType(25,[10])
+    bathConfig = ActiveLearnerTester.bathConfigType(10,[2,5,10,15,20])
     partialTrainConfig = None
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, vectorizer = vectorizer)
     
@@ -109,4 +109,4 @@ def testSomeSpecificCombination(source, target):
     testActiveLearnersWithBlitzerDomains(source, target)
     #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
-testSomeSpecificCombination(BlitzerDatasetDomain.dvd, BlitzerDatasetDomain.video)
+testSomeSpecificCombination(BlitzerDatasetDomain.outdoor, BlitzerDatasetDomain.sports)
