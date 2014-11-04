@@ -13,6 +13,7 @@ class SentimentIntensitySampleSelector(SampleSelector):
         SampleSelector.__init__(self)
         self.vectorizer = vectorizer
         self.sentimMeasure = SentimentWordFrequencyModel()
+        self.hadNonZeroScoreYet = False
         
     
     def getSentScore(self, sample):
@@ -46,6 +47,8 @@ class SentimentIntensitySampleSelector(SampleSelector):
         
         if count == 0:
             return 0
+        if (score != 0) and not self.hadNonZeroScoreYet:
+            self.hadNonZeroScoreYet = True
         return score/count
             
     
@@ -53,8 +56,10 @@ class SentimentIntensitySampleSelector(SampleSelector):
         print("selectSamples() in SentimentIntensitySampleSelector")
         samples = samplesPool[0]
         sent_scores = [self.getSentScore(sample) for sample in samples]
-        print("The sentiment scores in SentimentIntensitySampleSelector:")
-        print(sent_scores)
+        if not self.hadNonZeroScoreYet:
+            print("Only zero scores in this iteration of Sentiment Intensity selectSamples() !!!")
+        #print("The sentiment scores in SentimentIntensitySampleSelector:")
+        #print(sent_scores)
         scoreDict = {}
         for i in range(len(sent_scores)):
             scoreDict[i] = sent_scores[i]
