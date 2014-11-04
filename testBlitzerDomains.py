@@ -9,7 +9,7 @@ import parseProcessedDataFileForScikit
 import testActiveLearner
 from testActiveLearner import ActiveLearnerTester
 from BlitzerDatasetDomain import BlitzerDatasetDomain
-from SentimentWordFrequencyModel import SentimentWordFrequencyModel
+#from SentimentWordFrequencyModel import SentimentWordFrequencyModel
 
 from sklearn.feature_extraction import DictVectorizer
 from sklearn.preprocessing import LabelEncoder
@@ -57,11 +57,12 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     print("testY type is %s" % type(newTestYtarget))
     
     #Build feature sentiment dict
+    '''
     print("Building feature sentiment dict")
     featureNames = vectorizer.get_feature_names()
     sent = SentimentWordFrequencyModel()
     featSentDict = {}
-    '''
+    
     for i in range(len(featureNames)):
         word = featureNames[i]
         if '_' not in word:
@@ -98,14 +99,14 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     
-    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, False) #Runing only partialQBC
-    bathConfig = ActiveLearnerTester.bathConfigType(10,[55,60,65,70])
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(True, True, False, False, True) #Runing only partialQBC
+    bathConfig = ActiveLearnerTester.bathConfigType(10,[2])
     partialTrainConfig = None
-    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, featureSentimentDict = featSentDict)
+    testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, vectorizer = vectorizer)
     
 def testSomeSpecificCombination(source, target):
     print("testing from %s to %s" % (source.value, target.value))
     testActiveLearnersWithBlitzerDomains(source, target)
     #testActiveLearnersWithBlitzerDomains(source, target, batchRange = range(5,15,5))
 
-testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.toys)
+testSomeSpecificCombination(BlitzerDatasetDomain.automotive, BlitzerDatasetDomain.cellphones)

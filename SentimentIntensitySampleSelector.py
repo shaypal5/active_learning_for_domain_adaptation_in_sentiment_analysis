@@ -9,27 +9,40 @@ from SentimentWordFrequencyModel import SentimentWordFrequencyModel
 
 class SentimentIntensitySampleSelector(SampleSelector):
 
-    def __init__(self, featSentDict):
+    def __init__(self, vectorizer):
         SampleSelector.__init__(self)
-        self.featSentDict = featSentDict
+        self.vectorizer = vectorizer
         self.sentimMeasure = SentimentWordFrequencyModel()
+        
     
     def getSentScore(self, sample):
         count = 0
-        score = 0
+        score = 0        
+        nonZero = sample.nonzero()
+        nonCol = nonZero[1]
+        #nonRow = nonZero[0]        
+        #print("nonRow:")
+        #print(nonRow)
+        #print("nonCol:")
+        #print(nonCol)
         
+        for i in nonCol:
+            word = self.vectorizer.get_feature_names()[i]
+            if '_' not in word:
+                count += 1
+                score += abs(self.sentimMeasure.getSentimentOfWord(word))
+        '''
         for i in range(sample.shape[1]):
             if (sample[0,i] != 0):
-                if i in self.featSentDict:
-                    count += 1
-                    score += abs(self.featSentDict[i])
-                '''
+#                if i in self.featSentDict:
+#                    count += 1
+#                    score += abs(self.featSentDict[i])
                 word = self.vectorizer.get_feature_names()[i]
                 if '_' not in word:
                     count += 1
                     score += abs(self.sentimMeasure.getSentimentOfWord(word))
                     #print("%s, %f" % (word,sample[0,i]))
-                '''
+        '''
         
         if count == 0:
             return 0
