@@ -7,7 +7,7 @@ Created on Tue Oct 14 17:49:30 2014
 from NewSampleSelector import SampleSelector
 from SentimentWordFrequencyModel import SentimentWordFrequencyModel
 
-class SentimentIntensitySampleSelector(SampleSelector):
+class SentimentPolaritySampleSelector(SampleSelector):
 
     def __init__(self, vectorizer):
         SampleSelector.__init__(self)

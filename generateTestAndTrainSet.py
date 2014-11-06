@@ -27,6 +27,7 @@ def generateTestAndTrainSet(domain,specificBalancedFile = 0):
         balancedFilePath = domain.getBalancedFileFullPath()
     else:
         balancedFilePath = domain.getBalancedFileFullPath()+"."+str(specificBalancedFile)
+    print("---------------------------------------------------")
     print("Generating test and train set for domain %s" % domain.value)
     TRAIN_PERCENT = 0.7
     trainSet = []
@@ -82,3 +83,5 @@ def generateTestAndTrainSet(domain,specificBalancedFile = 0):
 
 for domain in BlitzerDatasetDomain:
     generateTestAndTrainSet(domain)
+    print("---------------------------------------------------")
+    print("Generated test and train sets for all domains.")
