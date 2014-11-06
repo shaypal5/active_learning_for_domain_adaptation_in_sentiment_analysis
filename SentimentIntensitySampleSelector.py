@@ -49,7 +49,8 @@ class SentimentIntensitySampleSelector(SampleSelector):
             return 0
         if (score != 0) and not self.hadNonZeroScoreYet:
             self.hadNonZeroScoreYet = True
-        return score/count
+        score = score / count # normalized score by the total number of unigrams
+        return score
             
     
     def selectSamples(self, svm,samplesPool,batchSize):

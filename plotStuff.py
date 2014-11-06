@@ -54,6 +54,27 @@ with plt.style.context('fivethirtyeight'):
     plt.savefig('partialQBC_accuracy.pdf')
     plt.show()
     
+    #STQBC selectr accuracy plot
+    print("STQBC selector accuracy plot")
+    fig3 = plt.figure(3)
+    fig3.set_size_inches(9,6)
+    stAcuPlt = fig3.add_subplot(111)
+    stAcuPlt.plot(values, [0.7307 for i in range(len(values))], 'r--')
+    stAcuPlt.plot(values, [0.8876 for i in range(len(values))], 'b--')
+    stAcu = [None,0.7713125845737483, 0.7821380243572396, 0.7760487144790257,
+                0.7895805142083897,0.8328822733423545,0.8240866035182679,
+               0.8247631935047361,0.8288227334235453,0.8410013531799729,
+               0.8470906630581867,0.8491204330175913,0.8558863328822733,
+               0.854533152909337,0.8660351826792964,0.8565629228687416]
+    stAcuPlt.plot(values, stAcu)
+    plt.ylim(0.5,1)
+    #partAcuPlt.set_xlabel('Number of instances', color='k', fontsize=12)
+    #partAcuPlt.set_ylabel('Accuracy', color='k', fontsize=12)
+    stAcuPlt.tick_params(axis='x', labelcolor='k', labelsize = 18)#, colors='k',)
+    stAcuPlt.tick_params(axis='y', labelcolor='k', labelsize = 18)
+    plt.savefig('STQBC_accuracy.pdf')
+    plt.show()
+    
     
     #General accruacy bar graph
     N = 8 #the number of groups

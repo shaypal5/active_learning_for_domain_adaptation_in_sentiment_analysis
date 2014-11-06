@@ -237,7 +237,7 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
         print("(7) Testing Active Learning classifier with *Sentiment Polarity* sample selector: ") 
         for numOfIter in bathConfig.batchRange:
             print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
-            selector = SentimentIntensitySampleSelector(vectorizer)
+            selector = SentimentPolaritySampleSelector(vectorizer)
             learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
             sentimentPolarityClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             sentimentPolarityClassRes = testResultantClassifier('partial_committee_classifier', sentimentPolarityClassifier, targetDomain.test)
