@@ -79,28 +79,31 @@ with plt.style.context('fivethirtyeight'):
     #General accruacy bar graph
     N = 8 #the number of groups
     ind = np.arange(N)  # the x locations for the groups
-    width = 0.15       # the width of the bars
-    fig, ax = plt.subplots()
-    fig.set_size_inches(9,5)
+    width = 0.13       # the width of the bars
+    fig4, ax = plt.subplots()
+    fig4.set_size_inches(9,5)
+    fig4.suptitle('Big to Small    Big to Big    Small to Small    Small to Big', y=0.03, fontsize=15)
     
     sourceAcc = (0.9674, 1.084, 1.02298850574713, 0.978082824, 0.879955539, 0.892857143, 0.91954023, 0.831460674)
     rects1 = ax.bar(ind, sourceAcc, width, color='#E24A33' )
     uncertainAcc = (0.97399834534925, 1.08433734939759, 1.02298850574713, 1.006575153, 1.004940101, 1, 1.011494253, 0.95505618)
-    rects2 = ax.bar(ind+width, uncertainAcc, width, color='#7A68A6')
+    rects2 = ax.bar(ind+width, uncertainAcc, width, color='#188487')
     partialAcc = (0.9935, 1.08433734939759, 0.988888888888889, 1, 0.984932691, 1.011904762, 0.988505747, 0.943820225)
-    rects3 = ax.bar(ind+2*width, partialAcc, width, color='#188487')
+    rects3 = ax.bar(ind+2*width, partialAcc, width, color='#7A68A6')
     stqbcAcc = (0.9935, 1.07228915662651, 1.03448275862069, 0.995616565, 0.924910461, 0.952380952, 1.011494253, 0.95505618)
     rects4 = ax.bar(ind+3*width, stqbcAcc, width)#, color='#467821')
     sentIntAcc = (0.973998345, 1.089638554, 1.028850575, 0.989041412, 0.97999259, 0.971785714, 0.973793103, 0.928202247)
     rects5 = ax.bar(ind+4*width, sentIntAcc, width, color='y')
+    sentPolAcc = (0.986999173, 1.06939759, 1.04, 0.997808282, 0.969988885, 0.99, 0.956896552, 0.928202247)
+    rects6 = ax.bar(ind+5*width, sentPolAcc, width, color='#e59c16')
     
     # add some text for labels, title and axes ticks
     #ax.set_ylabel('Relative Accuracy', color='k', fontsize=12)
     #ax.set_title('Scores by group and gender', color='k')
     ax.set_xticks(ind+2*width)
-    ax.set_xticklabels( ('Similar \n Big To Small', 'Different', 'Similar \n Big To Big', 'Different', 'Similar \n Small To Small', 'Different', 'Similar \n Small To Big', 'Different') , color='k', fontsize=12)
+    ax.set_xticklabels( ('Similar', 'Different', 'Similar', 'Different', 'Similar', 'Different', 'Similar', 'Different') , color='k', fontsize=12)
     
-    lg = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0], rects5[0]), ('SourceSVM', 'Uncertainty', 'PartialQBC', 'STQBC', 'SentimentIntensity') )
+    lg = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0], rects5[0], rects6[0]), ('SourceSVM', 'Uncertainty', 'PartialQBC', 'STQBC', 'SentimentIntensity', 'Senitment Polarity'),prop={'size':8} )
     lg.draw_frame(True)
     frame = lg.get_frame()
     frame.set_ec('0.45')

@@ -40,25 +40,28 @@ class SentimentPolaritySampleSelector(SampleSelector):
             return 0
             
         if neg == 0 or pos == 0:
-            return 1
+            return 0
         
+        normPos = pos / count
+        normNeg = neg / count
         #polarityScore = min(pos/neg, neg/pos)
-        polarityScore = max(pos/neg, neg/pos)
-        polarityScore = polarityScore / count
+        polarityScore = min(normPos/normNeg, normNeg/normPos)
+        #polarityScore = max(pos/neg, neg/pos)
+        #polarityScore = polarityScore / count
         if (polarityScore != 0) and not self.hadNonZeroScoreYet:
             self.hadNonZeroScoreYet = True
         return polarityScore
             
     
     def selectSamples(self, svm,samplesPool,batchSize):
-        print("selectSamples() in SentimentPolaritySampleSelector")
+        #print("selectSamples() in SentimentPolaritySampleSelector")
         self.hadNonZeroScoreYet = False
         samples = samplesPool[0]
         sent_scores = [self.getSentScore(sample) for sample in samples]
         if not self.hadNonZeroScoreYet:
             print("Only zero scores in this iteration of Sentiment Polarity selectSamples() !!!")
-        print("The sentiment scores in SentimentPolaritySampleSelector:")
-        print(sent_scores)
+        #print("The sentiment scores in SentimentPolaritySampleSelector:")
+        #print(sent_scores)
         scoreDict = {}
         for i in range(len(sent_scores)):
             scoreDict[i] = sent_scores[i]
