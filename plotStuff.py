@@ -79,7 +79,7 @@ with plt.style.context('fivethirtyeight'):
     #General accruacy bar graph
     N = 8 #the number of groups
     ind = np.arange(N)  # the x locations for the groups
-    width = 0.13       # the width of the bars
+    width = 0.12       # the width of the bars
     fig4, ax = plt.subplots()
     fig4.set_size_inches(9,5)
     fig4.suptitle('Big to Small    Big to Big    Small to Small    Small to Big', y=0.03, fontsize=15)
@@ -96,6 +96,8 @@ with plt.style.context('fivethirtyeight'):
     rects5 = ax.bar(ind+4*width, sentIntAcc, width, color='y')
     sentPolAcc = (0.986999173, 1.06939759, 1.04, 0.997808282, 0.969988885, 0.99, 0.956896552, 0.928202247)
     rects6 = ax.bar(ind+5*width, sentPolAcc, width, color='#e59c16')
+    sentDistAcc = (0.980498759, 1.082891566, 1.037816092, 1.004383435, 0.95998518, 0.965714286, 0.96816092, 0.928876404)
+    rects7 = ax.bar(ind+6*width, sentDistAcc, width, color='#a06d0f')
     
     # add some text for labels, title and axes ticks
     #ax.set_ylabel('Relative Accuracy', color='k', fontsize=12)
@@ -103,7 +105,7 @@ with plt.style.context('fivethirtyeight'):
     ax.set_xticks(ind+2*width)
     ax.set_xticklabels( ('Similar', 'Different', 'Similar', 'Different', 'Similar', 'Different', 'Similar', 'Different') , color='k', fontsize=12)
     
-    lg = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0], rects5[0], rects6[0]), ('SourceSVM', 'Uncertainty', 'PartialQBC', 'STQBC', 'SentimentIntensity', 'Senitment Polarity'),prop={'size':8} )
+    lg = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0], rects5[0], rects6[0], rects7[0]), ('SourceSVM', 'Uncertainty', 'PartialQBC', 'STQBC', 'SentimentIntensity', 'Senitment Polarity', 'Senitment Distinctness'),prop={'size':7.4} )
     lg.draw_frame(True)
     frame = lg.get_frame()
     frame.set_ec('0.45')

@@ -10,6 +10,7 @@ from QueryByPartialDataCommiteeSampleSelector import QueryByPartialDataCommiteeS
 from TargetAndSourceQBCSampleSelector import TargetAndSourceQBCSampleSelector
 from SentimentIntensitySampleSelector import SentimentIntensitySampleSelector
 from SentimentPolaritySampleSelector import SentimentPolaritySampleSelector
+from SentimentDistinctnessSampleSelector import SentimentDistinctnessSampleSelector
 
 import ActiveLearner
 
@@ -25,7 +26,7 @@ class ActiveLearnerTester:
     dataType = collections.namedtuple('data', ['X', 'Y'])
     domainType = collections.namedtuple('domain', ['name', 'train', 'test'])
     resultsType = collections.namedtuple('result', ['name', 'correct', 'incorrect', 'TP', 'FP', 'TN', 'FN', 'precision', 'recall', 'accuracy'])
-    classifiersToRunType = collections.namedtuple('classifiersToRun', ['target', 'uncertainty', 'partialQBC', 'STQBC', 'sentimentIntensity', 'sentimentPolarity'])
+    classifiersToRunType = collections.namedtuple('classifiersToRun', ['target', 'uncertainty', 'partialQBC', 'STQBC', 'sentimentIntensity', 'sentimentPolarity', 'sentimentDistinctness'])
     bathConfigType = collections.namedtuple('batchConfig', ['batchSize', 'batchRange'])
     partialTrainConfigType = collections.namedtuple('partialTrainConfig', ['partialSourceTrain', 'partialTargetTrain', 'partialSourceTrainSize'])
     
@@ -160,6 +161,8 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
     partialComClassRes = None    
     targetSourceQBCClassRes = None
     sentimentIntensityClassRes = None
+    sentimentPolarityClassRes = None
+    sentimentDistinctnessClassRes = None
     
     #train classifier on target domain
     if classifiersToRun.target:
@@ -242,7 +245,22 @@ def testActiveLearners(sourceDomain, targetDomain, classifiersToRun = None, bath
             sentimentPolarityClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
             sentimentPolarityClassRes = testResultantClassifier('partial_committee_classifier', sentimentPolarityClassifier, targetDomain.test)
             print("=================================================================================")    
+    
+    
+    
+    #test Sentiment Polarity selector
+    if classifiersToRun.sentimentDistinctness:
+        print("\n")
+        print("=================================================================================") 
+        print("(8) Testing Active Learning classifier with *Sentiment Distinctness* sample selector: ") 
+        for numOfIter in bathConfig.batchRange:
+            print("With %d iterations of %d each" % (numOfIter, bathConfig.batchSize))
+            selector = SentimentDistinctnessSampleSelector(vectorizer)
+            learner = ActiveLearner.ActiveLearner(selector, numOfIter, None, bathConfig.batchSize)
+            sentimentDistinctnessClassifier = learner.train(sourceClassifier,[sourceDomain.train.X,sourceDomain.train.Y],[targetDomain.train.X,targetDomain.train.Y])
+            sentimentDistinctnessClassRes = testResultantClassifier('partial_committee_classifier', sentimentDistinctnessClassifier, targetDomain.test)
+            print("=================================================================================")     
             
     print("Test done")
-    results = collections.namedtuple('results', ['source', 'target', 'uncertainty', 'partialQBC', 'STQBC', 'sentimentIntensity', 'sentimentPolarity'])    
-    return results(sourceClassRes, targetClassRes, uncertaintyClassRes, partialComClassRes, targetSourceQBCClassRes, sentimentIntensityClassRes, sentimentPolarityClassRes)
+    results = collections.namedtuple('results', ['source', 'target', 'uncertainty', 'partialQBC', 'STQBC', 'sentimentIntensity', 'sentimentPolarity', 'sentimentDistinctness'])    
+    return results(sourceClassRes, targetClassRes, uncertaintyClassRes, partialComClassRes, targetSourceQBCClassRes, sentimentIntensityClassRes, sentimentPolarityClassRes, sentimentDistinctnessClassRes)

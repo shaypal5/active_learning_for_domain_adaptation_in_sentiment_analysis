@@ -168,6 +168,7 @@ def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = F
     runSTQBC = False
     runSentimentIntensity = False
     runSentimentPolarity = False
+    runDistinctnessPolarity = False
     batchSize = 20        #the size of each size
     batchRange = [numberOfBatches] #numbr of batches
     if partialSourceTrainSize != None:
@@ -176,7 +177,7 @@ def testActiveLearnersWithToyData(sourceData, targetData, partialTargetTrain = F
         partialSourceTrainSize = False
     
     #package parameters
-    classifiersToRun = ActiveLearnerTester.classifiersToRunType(runTarget, runUncertainty, runPartialQBC, runSTQBC, runSentimentIntensity, runSentimentPolarity) #Runing only target and uncertainty
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(runTarget, runUncertainty, runPartialQBC, runSTQBC, runSentimentIntensity, runSentimentPolarity, runDistinctnessPolarity) #Runing only target and uncertainty
     bathConfig = ActiveLearnerTester.bathConfigType(batchSize,batchRange)
     partialTrainConfig = ActiveLearnerTester.partialTrainConfigType(partialSourceTrain, partialTargetTrain, partialSourceTrainSize)
     
