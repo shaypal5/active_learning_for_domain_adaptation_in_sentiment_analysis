@@ -99,8 +99,8 @@ def testActiveLearnersWithBlitzerDomains(sourceDomain, targetDomain):
     newSourceDomain = testActiveLearner.ActiveLearnerTester.domainType(sourceDomain.value, newTrainSource, newTestSource)
     newTargetDomain = testActiveLearner.ActiveLearnerTester.domainType(targetDomain.value, newTrainTarget, newTestTarget)
     
-    classifiersToRun = ActiveLearnerTester.classifiersToRunType(False, False, False, False, False, False, True) #Runing only Sentiment Polarity
-    bathConfig = ActiveLearnerTester.bathConfigType(10,[65,70])
+    classifiersToRun = ActiveLearnerTester.classifiersToRunType(False, False, False, False, False, True, False) #Runing only Sentiment Intensity
+    bathConfig = ActiveLearnerTester.bathConfigType(10,[35,40])
     partialTrainConfig = None
     testActiveLearner.testActiveLearners(newSourceDomain, newTargetDomain, classifiersToRun = classifiersToRun, bathConfig = bathConfig, partialTrainConfig = partialTrainConfig, vectorizer = vectorizer)
     

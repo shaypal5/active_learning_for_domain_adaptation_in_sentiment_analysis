@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import matplotlib
 import matplotlib.pyplot as plt
-import numpy as np
-
 from AlphaRes import AlphaRes
-
 
 #General style for all plots
 with plt.style.context('fivethirtyeight'):
