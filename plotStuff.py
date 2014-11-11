@@ -85,7 +85,7 @@ with plt.style.context('fivethirtyeight'):
     fig4.suptitle('Big to Small    Big to Big    Small to Small    Small to Big', y=0.03, fontsize=15)
     
     sourceAcc = (0.9674, 1.084, 1.02298850574713, 0.978082824, 0.879955539, 0.892857143, 0.91954023, 0.831460674)
-    rects1 = ax.bar(ind, sourceAcc, width, color='#E24A33' )
+    rects1 = ax.bar(ind, sourceAcc, width, color='#e45c47' )
     uncertainAcc = (0.97399834534925, 1.08433734939759, 1.02298850574713, 1.006575153, 1.004940101, 1, 1.011494253, 0.95505618)
     rects2 = ax.bar(ind+width, uncertainAcc, width, color='#188487')
     partialAcc = (0.9935, 1.08433734939759, 0.988888888888889, 1, 0.984932691, 1.011904762, 0.988505747, 0.943820225)
@@ -105,7 +105,7 @@ with plt.style.context('fivethirtyeight'):
     ax.set_xticks(ind+2*width)
     ax.set_xticklabels( ('Similar', 'Different', 'Similar', 'Different', 'Similar', 'Different', 'Similar', 'Different') , color='k', fontsize=12)
     
-    lg = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0], rects5[0], rects6[0], rects7[0]), ('SourceSVM', 'Uncertainty', 'PartialQBC', 'STQBC', 'SentimentIntensity', 'Senitment Polarity', 'Senitment Distinctness'),prop={'size':7.4} )
+    lg = ax.legend( (rects1[0], rects2[0], rects3[0], rects4[0], rects5[0], rects6[0], rects7[0]), ('Source SVM', 'Uncertainty Sampling', 'Partial QBC', 'Source & Target QBC', 'Sentiment Intensity', 'Senitment Polarity', 'Senitment Distinctness'),prop={'size':7.4} )
     lg.draw_frame(True)
     frame = lg.get_frame()
     frame.set_ec('0.45')
