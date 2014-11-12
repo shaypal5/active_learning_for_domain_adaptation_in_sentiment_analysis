@@ -45,13 +45,13 @@ def plotAccuracyBarGraph(colorsArray):
         frame = lg.get_frame()
         frame.set_ec('0.45')
         frame.set_linewidth(1)
-        ax.axhline(y=1, linewidth=2, color='k', zorder=0, ls='dashed')
         
         #autolabel(rects1)
         #autolabel(rects2)
         #autolabel(rects2)
         #autolabel(rects2)
         plt.ylim(0.8,1.1)
+        ax.axhline(y=1, linewidth=2, color='k', zorder=0, ls='dashed')
         plt.savefig(folderPath + 'accuracy_bar_graph.pdf')
         plt.show()
 
@@ -69,9 +69,9 @@ def plotAlgAccuracy(sourceAcc, targetAcc, algAcc, filename, ylimlow = 0.5, ylimu
         #fig1.patch.set_facecolor('w')
         acuPlt = fig1.add_subplot(111)#, axisbg='w')
         values = [0,20,50,100,150,200,250,300,350,400,450,500,550,600,650,700]
-        acuPlt.plot(values, [sourceAcc for i in range(len(values))], 'r--')
-        acuPlt.plot(values, [targetAcc for i in range(len(values))], 'b--')
-        acuPlt.plot(values, algAcc)
+        acuPlt.plot(values, [sourceAcc for i in range(len(values))], '--', color='#d11141')
+        acuPlt.plot(values, [targetAcc for i in range(len(values))], '--', color='#00B159')
+        acuPlt.plot(values, algAcc, color='#00aedb')
         plt.ylim(ylimlow, ylimup)
         #uncAcuPlt.set_xlabel('Number of instances', fontsize=12, color='k')
         #uncAcuPlt.set_ylabel('Accuracy', fontsize=12, color='k')
@@ -172,12 +172,12 @@ sentDistAcu = [0.8029556650246306, 0.8357963875205254, 0.8325123152709359, 0.844
 sentDistFilename = 'sentiment_distinctness_accuracy.pdf'
 
 
-#plotAlgAccuracy(defSourceAcc, defTargetAcc, UncAcu, uncFilename)
-#plotAlgAccuracy(defSourceAcc, defTargetAcc, partAcu, partFilename)
-#plotAlgAccuracy(defSourceAcc, defTargetAcc, stAcu, stFilename)
-#plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentIntAcu, sentIntFilename, sentylimlow, senylimup)
-#plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentPolAcu, sentPolFilename, sentylimlow, senylimup)
-#plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentDistAcu, sentDistFilename, sentylimlow, senylimup)
+plotAlgAccuracy(defSourceAcc, defTargetAcc, UncAcu, uncFilename)
+plotAlgAccuracy(defSourceAcc, defTargetAcc, partAcu, partFilename)
+plotAlgAccuracy(defSourceAcc, defTargetAcc, stAcu, stFilename)
+plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentIntAcu, sentIntFilename, sentylimlow, senylimup)
+plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentPolAcu, sentPolFilename, sentylimlow, senylimup)
+plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentDistAcu, sentDistFilename, sentylimlow, senylimup)
 
 orgDiff = defTargetAcc - defSourceAcc
 sentDiff = sentTargetAcc - sentSourceAcc
@@ -202,9 +202,9 @@ valArray = [normUncAcu, normPartAcu, normStAcu, normSentIntAcu, normSentPolAcu, 
 #colorsArray = ['#3b5998', '#adff00', '#74d600', '#028900', '#fe8181', '#fe2e2e', '#b62020'] # blue for source, greens for general, reds for sentiment
 colorsArray = ['#00aedb', '#4cc88a', '#00B159', '#007b3e', '#de587a', '#d11141', '#920b2d'] # Metro UI-like pastels. blue for source, greens for general, reds for sentiment
 #colorsArray = ['#dea666', '#86dd9f', '#53CF77', '#3a9053', '#d08f8f', '#bc5f5f', '#834242'] # pastels. blue for source, greens for general, reds for sentiment
-plotComparativeAccuracy(valArray, colorsArray[1:])
+#plotComparativeAccuracy(valArray, colorsArray[1:])
 
-plotAccuracyBarGraph(colorsArray)
+#plotAccuracyBarGraph(colorsArray)
         
 print("finished plotting")
 
