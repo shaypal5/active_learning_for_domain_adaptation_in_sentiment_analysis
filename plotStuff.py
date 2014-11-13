@@ -2,14 +2,24 @@
 
 import matplotlib.pyplot as plt
 import numpy as np
+import socket
     
-folderPath = 'C:/Dropbox/University/Courses/Computer Science/Modern Statistical Data Anaysis/Final Project/Final Paper/'    
+def getFolderPath():
+    if (socket.gethostname() == 'InbarPC'):
+        return('C:/Dropbox/University/Courses/Modern Statistical Data Anaysis/Final Project/Final Paper/')
+    if (socket.gethostname() == 'Shay-Lenovo-Lap'):
+        return('C:/Dropbox/University/Courses/Modern Statistical Data Anaysis/Final Project/Final Paper/')
+    if (socket.gethostname() == 'ShayPalachy-PC'):
+        return('C:/Dropbox/University/Courses/Modern Statistical Data Anaysis/Final Project/Final Paper/')
+    if (socket.gethostname() == 'SNEEZY'):
+        return('C:/OrZuk/Data/sorted_data/')
+    if (socket.gethostname() == 'Reem-PC'):
+        return('C:/OrZuk/Data/sorted_data/')
+    return None
 
 def plotAccuracyBarGraph(colorsArray):
     #General style for all plots
     with plt.style.context('fivethirtyeight'):
-        
-        global folderPath
         
         #General accruacy bar graph
         N = 8 #the number of groups
@@ -52,17 +62,16 @@ def plotAccuracyBarGraph(colorsArray):
         #autolabel(rects2)
         plt.ylim(0.8,1.1)
         ax.axhline(y=1, linewidth=2, color='k', zorder=0, ls='dashed')
-        plt.savefig(folderPath + 'accuracy_bar_graph.pdf')
+        plt.savefig(getFolderPath() + 'accuracy_bar_graph.pdf')
         plt.show()
 
 def plotAlgAccuracy(sourceAcc, targetAcc, algAcc, filename, ylimlow = 0.5, ylimup = 1):
-    global folderPath
     with plt.style.context('fivethirtyeight'):
         
         #matplotlib.rc('axes', edgecolor='k', linewidth=0.5)    
         #matplotlib.rc('grid', color='k')
         
-        print("Plotting "+filename)
+        ("Plotting "+filename)
         fig1 = plt.figure(1)#, edgecolor='k', linewidth=1)
         fig1.set_size_inches(9,6)
         #fig1.suptitle('Accuracy of Uncertainty Selection', fontsize=13)
@@ -79,14 +88,13 @@ def plotAlgAccuracy(sourceAcc, targetAcc, algAcc, filename, ylimlow = 0.5, ylimu
         acuPlt.tick_params(axis='y', labelcolor='k', labelsize = 18)#, colors='k', size=20)
         #for spine in uncAcuPlt.spines.values():
         #    spine.set_edgecolor('k')
-        plt.savefig(folderPath+filename)
+        plt.savefig(getFolderPath()+filename)
         plt.show()
         
 def getNormalizedAccValues(accValues, baseValue, stretchFactor):
     return [(value-baseValue)*stretchFactor for value in accValues]
     
-def plotComparativeAccuracy(valueArrays, colorsArray):
-    global folderPath
+def plotComparativeGraph(xValues, valueArrays, labelsArray, colorsArray, fileName, ylowlim, yuplim, legendSize):
     with plt.style.context('fivethirtyeight'):
 
         fig1 = plt.figure(1)#, edgecolor='k', linewidth=1)
@@ -94,28 +102,27 @@ def plotComparativeAccuracy(valueArrays, colorsArray):
         #fig1.suptitle('Accuracy of Uncertainty Selection', fontsize=13)
         #fig1.patch.set_facecolor('w')
         acuPlt = fig1.add_subplot(111)#, axisbg='w')
-        values = [0,20,50,100,150,200,250,300,350,400,450,500,550,600,650,700]
         handlesArray = [None]*len(valueArrays)
         i = 0
         for array in valueArrays:
-            handlesArray[i], = acuPlt.plot(values, array, color = colorsArray[i])
+            handlesArray[i], = acuPlt.plot(xValues, array, color = colorsArray[i])
             i += 1
         #uncAcuPlt.set_xlabel('Number of instances', fontsize=12, color='k')
         #uncAcuPlt.set_ylabel('Accuracy', fontsize=12, color='k')
-        plt.ylim(0, 1.5)
+        plt.ylim(ylowlim, yuplim)
         acuPlt.tick_params(axis='x', labelcolor='k', labelsize = 18)#, colors='k',)
         acuPlt.tick_params(axis='y', labelcolor='k', labelsize = 18)#, colors='k', size=20)
         #for spine in uncAcuPlt.spines.values():
         #    spine.set_edgecolor('k')
         
         #Legend    
-        lg = fig1.legend( handles=handlesArray, labels = ['Uncertainty Sampling', 'Partial QBC', 'Source & Target QBC', 'Sentiment Intensity', 'Senitment Polarity', 'Senitment Distinctness'], prop={'size':13} ) 
+        lg = fig1.legend( handles=handlesArray, labels = labelsArray, prop={'size':legendSize} ) 
         lg.draw_frame(True)
         frame = lg.get_frame()
         frame.set_ec('0.45')
         frame.set_linewidth(1)        
         
-        plt.savefig(folderPath+'comparative_accuracy.pdf')
+        plt.savefig(getFolderPath()+fileName)
         plt.show()
 
 defSourceAcc = 0.7307
@@ -172,12 +179,12 @@ sentDistAcu = [0.8029556650246306, 0.8357963875205254, 0.8325123152709359, 0.844
 sentDistFilename = 'sentiment_distinctness_accuracy.pdf'
 
 
-plotAlgAccuracy(defSourceAcc, defTargetAcc, UncAcu, uncFilename)
-plotAlgAccuracy(defSourceAcc, defTargetAcc, partAcu, partFilename)
-plotAlgAccuracy(defSourceAcc, defTargetAcc, stAcu, stFilename)
-plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentIntAcu, sentIntFilename, sentylimlow, senylimup)
-plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentPolAcu, sentPolFilename, sentylimlow, senylimup)
-plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentDistAcu, sentDistFilename, sentylimlow, senylimup)
+#plotAlgAccuracy(defSourceAcc, defTargetAcc, UncAcu, uncFilename)
+#plotAlgAccuracy(defSourceAcc, defTargetAcc, partAcu, partFilename)
+#plotAlgAccuracy(defSourceAcc, defTargetAcc, stAcu, stFilename)
+#plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentIntAcu, sentIntFilename, sentylimlow, senylimup)
+#plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentPolAcu, sentPolFilename, sentylimlow, senylimup)
+#plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentDistAcu, sentDistFilename, sentylimlow, senylimup)
 
 orgDiff = defTargetAcc - defSourceAcc
 sentDiff = sentTargetAcc - sentSourceAcc
@@ -198,11 +205,24 @@ normSentDistAcu = getNormalizedAccValues(sentDistAcu, sentSourceAcc, sentStrech)
 #print("normalized sentDistAcu:")
 #print(normSentDistAcu)
 
+accXvalues = [0,20,50,100,150,200,250,300,350,400,450,500,550,600,650,700]
+
 valArray = [normUncAcu, normPartAcu, normStAcu, normSentIntAcu, normSentPolAcu, normSentDistAcu]
 #colorsArray = ['#3b5998', '#adff00', '#74d600', '#028900', '#fe8181', '#fe2e2e', '#b62020'] # blue for source, greens for general, reds for sentiment
 colorsArray = ['#00aedb', '#4cc88a', '#00B159', '#007b3e', '#de587a', '#d11141', '#920b2d'] # Metro UI-like pastels. blue for source, greens for general, reds for sentiment
 #colorsArray = ['#dea666', '#86dd9f', '#53CF77', '#3a9053', '#d08f8f', '#bc5f5f', '#834242'] # pastels. blue for source, greens for general, reds for sentiment
-#plotComparativeAccuracy(valArray, colorsArray[1:])
+compAccFileName = 'comparative_accuracy.pdf'
+compAccLabelsArray = ['Uncertainty Sampling', 'Partial QBC', 'Source & Target QBC', 'Sentiment Intensity', 'Senitment Polarity', 'Senitment Distinctness']
+#plotComparativeGraph(accXvalues, valArray, compAccLabelsArray, colorsArray[1:], compAccFileName, 0, 1.5, 13)
+
+#Plotting comparative accuracy for the basic simulation
+klXvalues = [0, 12827, 26056, 42532, 51172, 67003, 69048, 94916, 103604, 125715]
+simSourceAcc = [0.688, 0.627, 0.6425, 0.682, 0.55, 0.589, 0.573, 0.568, 0.6475, 0.515]
+simTargetAcc = [0.693, 0.666, 0.658, 0.606, 0.717, 0.664, 0.683, 0.728, 0.613, 0.793]
+simUncAcc = [0.696, 0.657, 0.672, 0.732, 0.721, 0.738, 0.73, 0.75, 0.722, 0.712]
+simCompAccFileName = 'sim_comparative_accuracy.pdf'
+simCompAccLabelsArray = ['Source SVM', 'Target SVM', 'Uncertainty Sampling']
+plotComparativeGraph(klXvalues, [simSourceAcc, simTargetAcc, simUncAcc], simCompAccLabelsArray, [colorsArray[5], colorsArray[2], colorsArray[0]], simCompAccFileName, 0.5, 0.85, 18)
 
 #plotAccuracyBarGraph(colorsArray)
         
