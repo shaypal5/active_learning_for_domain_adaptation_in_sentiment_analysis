@@ -12,9 +12,9 @@ def getFolderPath():
     if (socket.gethostname() == 'ShayPalachy-PC'):
         return('C:/Dropbox/University/Courses/Modern Statistical Data Anaysis/Final Project/Final Paper/')
     if (socket.gethostname() == 'SNEEZY'):
-        return('C:/OrZuk/Data/sorted_data/')
+        return('C:/Dropbox/University/Courses/Modern Statistical Data Anaysis/Final Project/Final Paper/')
     if (socket.gethostname() == 'Reem-PC'):
-        return('C:/OrZuk/Data/sorted_data/')
+        return('C:/Dropbox/University/Courses/Modern Statistical Data Anaysis/Final Project/Final Paper/')
     return None
 
 def plotAccuracyBarGraph(colorsArray):
@@ -94,11 +94,11 @@ def plotAlgAccuracy(sourceAcc, targetAcc, algAcc, filename, ylimlow = 0.5, ylimu
 def getNormalizedAccValues(accValues, baseValue, stretchFactor):
     return [(value-baseValue)*stretchFactor for value in accValues]
     
-def plotComparativeGraph(xValues, valueArrays, labelsArray, colorsArray, fileName, ylowlim, yuplim, legendSize):
+def plotComparativeGraph(xValues, valueArrays, labelsArray, colorsArray, fileName, ylowlim, yuplim, legendSize, figHeight = 6, useSciTicks = False):
     with plt.style.context('fivethirtyeight'):
 
         fig1 = plt.figure(1)#, edgecolor='k', linewidth=1)
-        fig1.set_size_inches(9,6)
+        fig1.set_size_inches(9,figHeight)
         #fig1.suptitle('Accuracy of Uncertainty Selection', fontsize=13)
         #fig1.patch.set_facecolor('w')
         acuPlt = fig1.add_subplot(111)#, axisbg='w')
@@ -179,9 +179,9 @@ sentDistAcu = [0.8029556650246306, 0.8357963875205254, 0.8325123152709359, 0.844
 sentDistFilename = 'sentiment_distinctness_accuracy.pdf'
 
 
-#plotAlgAccuracy(defSourceAcc, defTargetAcc, UncAcu, uncFilename)
-#plotAlgAccuracy(defSourceAcc, defTargetAcc, partAcu, partFilename)
-#plotAlgAccuracy(defSourceAcc, defTargetAcc, stAcu, stFilename)
+#plotAlgAccuracy(defSourceAcc, defTargetAcc, UncAcu, uncFilename, sentylimlow, senylimup)
+#plotAlgAccuracy(defSourceAcc, defTargetAcc, partAcu, partFilename, sentylimlow, senylimup)
+#plotAlgAccuracy(defSourceAcc, defTargetAcc, stAcu, stFilename, sentylimlow, senylimup)
 #plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentIntAcu, sentIntFilename, sentylimlow, senylimup)
 #plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentPolAcu, sentPolFilename, sentylimlow, senylimup)
 #plotAlgAccuracy(sentSourceAcc, sentTargetAcc, sentDistAcu, sentDistFilename, sentylimlow, senylimup)
@@ -213,16 +213,17 @@ colorsArray = ['#00aedb', '#4cc88a', '#00B159', '#007b3e', '#de587a', '#d11141',
 #colorsArray = ['#dea666', '#86dd9f', '#53CF77', '#3a9053', '#d08f8f', '#bc5f5f', '#834242'] # pastels. blue for source, greens for general, reds for sentiment
 compAccFileName = 'comparative_accuracy.pdf'
 compAccLabelsArray = ['Uncertainty Sampling', 'Partial QBC', 'Source & Target QBC', 'Sentiment Intensity', 'Senitment Polarity', 'Senitment Distinctness']
-#plotComparativeGraph(accXvalues, valArray, compAccLabelsArray, colorsArray[1:], compAccFileName, 0, 1.5, 13)
+#plotComparativeGraph(accXvalues, valArray, compAccLabelsArray, colorsArray[1:], compAccFileName, 0, 1.5, 13, figHeight = 5.5)
 
 #Plotting comparative accuracy for the basic simulation
 klXvalues = [0, 12827, 26056, 42532, 51172, 67003, 69048, 94916, 103604, 125715]
+#normKlXvalues = [value/10000 for value in klXvalues]
 simSourceAcc = [0.688, 0.627, 0.6425, 0.682, 0.55, 0.589, 0.573, 0.568, 0.6475, 0.515]
 simTargetAcc = [0.693, 0.666, 0.658, 0.606, 0.717, 0.664, 0.683, 0.728, 0.613, 0.793]
 simUncAcc = [0.696, 0.657, 0.672, 0.732, 0.721, 0.738, 0.73, 0.75, 0.722, 0.712]
 simCompAccFileName = 'sim_comparative_accuracy.pdf'
 simCompAccLabelsArray = ['Source SVM', 'Target SVM', 'Uncertainty Sampling']
-plotComparativeGraph(klXvalues, [simSourceAcc, simTargetAcc, simUncAcc], simCompAccLabelsArray, [colorsArray[5], colorsArray[2], colorsArray[0]], simCompAccFileName, 0.5, 0.85, 18)
+plotComparativeGraph(klXvalues, [simSourceAcc, simTargetAcc, simUncAcc], simCompAccLabelsArray, [colorsArray[5], colorsArray[2], colorsArray[0]], simCompAccFileName, 0.5, 0.85, 18, useSciTicks=True)
 
 #plotAccuracyBarGraph(colorsArray)
         
